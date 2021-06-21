@@ -3,4 +3,13 @@ body{
     padding: 0;
     overflow: scroll;
     display: flex;
+    justify-content: center;
+}
+
+#defaultCanvas0{
+    border-style: solid;
+}
+
+#paint{
+    position: fixed;
 }

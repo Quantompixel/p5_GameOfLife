@@ -1,20 +1,41 @@
-const canvasWidth = 500;
-const canvasHeight = 500;
+const canvasWidth = innerWidth*2;
+const canvasHeight = innerHeight*2;
 
 const cellSize = 10;
+let paintable = true;
+let field;
 
 function setup() {
     createCanvas(canvasWidth, canvasHeight);
+    //canvas id: #defaultCanvas0
+    frameRate(80);
 
     generateField();
+
+    document.getElementById("paint").addEventListener("click", function(){
+        //toggles paint
+        paintable = !paintable;
+    });
 }
   
 function draw() {
+    if(mouseIsPressed && paintable){
+        let drawX = Math.floor(mouseX/cellSize);
+        let drawY = Math.floor(mouseY/cellSize);
+
+        let drawCell = field.cellArray[drawY][drawX];
+        
+        if(drawCell == undefined){
+            return;
+        }else{
+            field.cellArray[drawY][drawX].setColor(0);
+        }
+    }
 }
 
 function generateField(){
-    let field = new Field(canvasWidth, canvasHeight, cellSize);
-    console.log(field.cellArray[1][1]);
+    field = new Field(canvasWidth, canvasHeight, cellSize);
+    field.cellArray[3][5].setColor("#0000ff");
 }
 
 function Field(width, height, cellSize){
@@ -27,7 +48,7 @@ function Field(width, height, cellSize){
         for (let i = 0; i < verticalCellCount; i++) {
             this.cellArray[i] = [];
             for (let k = 0; k < horizontalCellCount; k ++) {
-                this.cellArray[i][k] = (new Cell(k, i, cellSize, Math.round(Math.random()*255)));
+                this.cellArray[i][k] = (new Cell(k, i, cellSize, "#ffffff"));
             }
         }
     }
@@ -41,10 +62,12 @@ function Cell(x, y, cellSize, color){
     this.y = y;
     this.cellSize = cellSize;
     
+    noStroke();
     fill(color);
     rect(x*cellSize, y*cellSize, cellSize, cellSize);
 
-    this.update = function() {
-        
+    this.setColor = function(color) {
+        fill(color);
+        rect(x*cellSize, y*cellSize, cellSize, cellSize);
     }
 }
