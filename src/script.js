@@ -1,5 +1,5 @@
-const canvasWidth = innerWidth*2;
-const canvasHeight = innerHeight*2;
+const canvasWidth = innerWidth * 2;
+const canvasHeight = innerHeight * 2;
 
 const cellSize = 10;
 let paintable = true;
@@ -12,43 +12,42 @@ function setup() {
 
     generateField();
 
-    document.getElementById("paint").addEventListener("click", function(){
+    document.getElementById("paint").addEventListener("click", function () {
         //toggles paint
         paintable = !paintable;
     });
 }
-  
+
 function draw() {
-    if(mouseIsPressed && paintable){
-        let drawX = Math.floor(mouseX/cellSize);
-        let drawY = Math.floor(mouseY/cellSize);
+    if (mouseIsPressed && paintable) {
+        let drawX = Math.floor(mouseX / cellSize);
+        let drawY = Math.floor(mouseY / cellSize);
 
         let drawCell = field.cellArray[drawY][drawX];
-        
-        if(drawCell == undefined){
+
+        if (drawCell == undefined) {
             return;
-        }else{
-            field.cellArray[drawY][drawX].setColor(0);
+        } else {
+            field.cellArray[drawY][drawX].changeState();
         }
     }
 }
 
-function generateField(){
+function generateField() {
     field = new Field(canvasWidth, canvasHeight, cellSize);
-    field.cellArray[3][5].setColor("#0000ff");
 }
 
-function Field(width, height, cellSize){
+function Field(width, height, cellSize) {
     this.cellArray = [];
 
-    this.init = function() {
-        let horizontalCellCount = Math.floor(width/cellSize);
-        let verticalCellCount = Math.floor(height/cellSize);
+    this.init = function () {
+        let horizontalCellCount = Math.floor(width / cellSize);
+        let verticalCellCount = Math.floor(height / cellSize);
 
         for (let i = 0; i < verticalCellCount; i++) {
             this.cellArray[i] = [];
-            for (let k = 0; k < horizontalCellCount; k ++) {
-                this.cellArray[i][k] = (new Cell(k, i, cellSize, "#ffffff"));
+            for (let k = 0; k < horizontalCellCount; k++) {
+                this.cellArray[i][k] = (new Cell(k, i, cellSize, true));
             }
         }
     }
@@ -57,17 +56,19 @@ function Field(width, height, cellSize){
 
 }
 
-function Cell(x, y, cellSize, color){
+function Cell(x, y, cellSize, alive) {
     this.x = x;
     this.y = y;
     this.cellSize = cellSize;
-    
-    noStroke();
-    fill(color);
-    rect(x*cellSize, y*cellSize, cellSize, cellSize);
+    this.alive = alive;
 
-    this.setColor = function(color) {
-        fill(color);
-        rect(x*cellSize, y*cellSize, cellSize, cellSize);
+    noStroke();
+    fill(alive * 255);
+    rect(x * cellSize, y * cellSize, cellSize, cellSize);
+
+    this.changeState = function () {
+        alive = !alive;
+        fill(alive * 1);
+        rect(x * cellSize, y * cellSize, cellSize, cellSize);
     }
 }
