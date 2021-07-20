@@ -1,4 +1,4 @@
-body{
+body {
     margin: 0;
     padding: 0;
     overflow: scroll;
@@ -6,10 +6,15 @@ body{
     justify-content: center;
 }
 
-#defaultCanvas0{
+#defaultCanvas0 {
     border-style: solid;
 }
 
-#paint{
+#paint {
     position: fixed;
+}
+
+#update {
+    position: fixed;
+    left: 10px;
 }
