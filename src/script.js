@@ -16,10 +16,6 @@ function setup() {
         //toggles paint
         paintable = !paintable;
     });
-
-    
-    
-    //ellipse(10, 10, 100);
 }
 
 function draw() {
@@ -73,7 +69,7 @@ function Field(width, height, cellSize) {
         for (let i = 0; i < verticalCellCount; i++) {
             this.cellArray[i] = [];
             for (let k = 0; k < horizontalCellCount; k++) {
-                this.cellArray[i][k] = (new Cell(k, i, cellSize, false, false));
+                this.cellArray[i][k] = (new Cell(this, k, i, cellSize, false, false));
             }
         }
     }
@@ -86,25 +82,7 @@ function Field(width, height, cellSize) {
             for (let k = 0; k < this.cellArray[i].length; k++) {
                 const cell = this.cellArray[i][k];
 
-                let aliveNeighbours = 0;
-
-                for (let j = -1; j <= 1; j++) {
-                    for (let l = -1; l <= 1; l++) {
-                        if (i+j < 0 || l+k < 0) {
-                            continue;
-                        }
-                        if (i+j > this.cellArray.length-1 || l+k > this.cellArray[i].length-1) {
-                            continue;
-                        }
-
-                        aliveNeighbours += this.cellArray[i+j][l+k].alive;
-                    }
-                }
-
-                aliveNeighbours -= this.cellArray[i][k].alive;
-
-                fill(255,0,0);
-                text(aliveNeighbours, cell.x * cell.cellSize, cell.y * cell.cellSize);
+                const aliveNeighbours = this.checkNeighbours(cell.x, cell.y);
 
 
                 if (cell.alive) {
@@ -127,7 +105,7 @@ function Field(width, height, cellSize) {
             }
         }
 
-        /*for (let i = 0; i < this.cellArray.length; i++) {
+        for (let i = 0; i < this.cellArray.length; i++) {
             for (let k = 0; k < this.cellArray[i].length; k++) {
                 const cell = this.cellArray[i][k];
 
@@ -141,43 +119,31 @@ function Field(width, height, cellSize) {
 
                 cell.alive = cell.futureState;
             }
-        }*/
+        }
     }
 
-    this.getAliveNeighbours = function (x, y) {
-        let aliveCells = 0;
+    this.checkNeighbours = function (x, y) {
 
-        //x:2 , y:2
-        //1, 2, 3
-        for (let i = x - 1; i < x+2; i++) {
-            for (let k = y - 1; k < y+2; k++) {
-                //OutOfBounds
-                if (i < 0 || k < 0) {
-                    continue;
-                }
-                if (i > this.cellArray.length-1 || k > this.cellArray[i].length-1) {
-                    continue;
-                }
-                if (i == x && k == y) {
-                    continue;
-                }
+        const aliveNeighbours = this.isAlive(x - 1, y - 1) + this.isAlive(x, y - 1) + this.isAlive(x + 1, y - 1) + this.isAlive(x - 1, y) + this.isAlive(x + 1, y) + this.isAlive(x - 1, y + 1) + this.isAlive(x, y + 1) + this.isAlive(x + 1, y + 1);
+        
+        fill(255, 0, 0);
+        text(aliveNeighbours, x *10, y * 10);
 
-                if (this.cellArray[i][k] == undefined) {
-                    console.warn("Undefined");
-                }
-                
-                if (this.cellArray[i][k].alive) {
-                    aliveCells++;
-                }
-            }
+        return aliveNeighbours;
+    }
+
+    this.isAlive = function(x, y) {
+        if (x < 0 || x >= this.cellArray[0].length || y < 0 || y >= this.cellArray.length) {
+            return false;
         }
 
-        return aliveCells;
+        return this.cellArray[y][x].alive ? 1 : 0;
     }
 
 }
 
-function Cell(x, y, cellSize, alive, futureState) {
+function Cell(field, x, y, cellSize, alive, futureState) {
+    this.field = field;
     this.x = x;
     this.y = y;
     this.cellSize = cellSize;
