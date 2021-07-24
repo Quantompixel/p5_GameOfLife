@@ -1,9 +1,10 @@
-const canvasWidth = 500;
-const canvasHeight = 500;
+const canvasWidth = 1000;
+const canvasHeight = 700;
 
 const cellSize = 10;
 let paintable = true;
 let field;
+let interval;
 
 function setup() {
     createCanvas(canvasWidth, canvasHeight);
@@ -12,9 +13,35 @@ function setup() {
 
     generateField();
 
+    document.getElementById("defaultCanvas0").addEventListener("contextmenu", function(event){
+        event.preventDefault();
+    });
+
     document.getElementById("paint").addEventListener("click", function () {
         //toggles paint
         paintable = !paintable;
+    });
+
+    document.getElementById("start").addEventListener("click", function (event) {
+        if (typeof interval === 'undefined') {
+            interval = setInterval(function(){
+                field.update();
+            }, 50);
+            event.target.innerHTML = "stop";
+        }else{
+            clearInterval(interval);
+            interval = undefined;
+            event.target.innerHTML = "start";
+        }
+
+        
+    });
+
+    document.getElementById("clear").addEventListener("click", function () {
+        document.getElementById("start").innerHTML = "start";
+        clearInterval(interval);
+        interval = undefined;
+        field.init();
     });
 }
 
@@ -24,13 +51,23 @@ function draw() {
         let drawY = Math.floor(mouseY / cellSize);
 
         let drawCell = field.cellArray[drawY][drawX];
-
         if (typeof drawCell === 'undefined') {
             return;
-        } else if (drawCell.alive === true) {
-            return;
-        } else {
-            drawCell.changeState();
+        }
+
+        if (mouseButton === LEFT) {
+            if (drawCell.alive === true) {
+                return;
+            } else {
+                drawCell.changeState();
+            }
+        }
+        if (mouseButton === RIGHT) {
+            if (drawCell.alive === false) {
+                return;
+            } else {
+                drawCell.changeState();
+            }
         }
     }
 }
@@ -53,10 +90,6 @@ function mouseClicked() {
 function generateField() {
     field = new Field(canvasWidth, canvasHeight, cellSize);
     field.init();
-
-    document.getElementById("update").addEventListener("click", function () {
-        field.update();
-    });
 }
 
 function Field(width, height, cellSize) {
@@ -125,21 +158,20 @@ function Field(width, height, cellSize) {
     this.checkNeighbours = function (x, y) {
 
         const aliveNeighbours = this.isAlive(x - 1, y - 1) + this.isAlive(x, y - 1) + this.isAlive(x + 1, y - 1) + this.isAlive(x - 1, y) + this.isAlive(x + 1, y) + this.isAlive(x - 1, y + 1) + this.isAlive(x, y + 1) + this.isAlive(x + 1, y + 1);
-        
+
         fill(255, 0, 0);
-        text(aliveNeighbours, x *10, y * 10);
+        text(aliveNeighbours, x * 10, y * 10);
 
         return aliveNeighbours;
     }
 
-    this.isAlive = function(x, y) {
+    this.isAlive = function (x, y) {
         if (x < 0 || x >= this.cellArray[0].length || y < 0 || y >= this.cellArray.length) {
             return false;
         }
 
         return this.cellArray[y][x].alive ? 1 : 0;
     }
-
 }
 
 function Cell(field, x, y, cellSize, alive, futureState) {
@@ -151,23 +183,20 @@ function Cell(field, x, y, cellSize, alive, futureState) {
     this.futureState = futureState;
 
     this.init = function () {
-        noStroke();
+        stroke(0, 0, 0, 50);
         fill(!alive * 255);
         rect(x * cellSize, y * cellSize, cellSize, cellSize);
     }
     this.init();
 
     this.changeState = function () {
-        //not redrawing correctly
-
-
         this.alive = !this.alive;
-
 
         this.updateColor(this.alive);
     }
 
     this.updateColor = function (alive) {
+        stroke(0, 0, 0, 50);
         if (alive) {
             fill(0);
         } else {

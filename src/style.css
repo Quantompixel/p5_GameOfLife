@@ -14,7 +14,12 @@ body {
     position: fixed;
 }
 
-#update {
+#start {
     position: fixed;
     left: 10px;
+}
+
+#clear{
+    position: fixed;
+    left: 70px;
 }
