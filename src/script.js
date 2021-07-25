@@ -1,13 +1,13 @@
-const canvasWidth = 1000;
-const canvasHeight = 700;
+const canvasWidth = 2000;
+const canvasHeight = 2000;
 
-const cellSize = 10;
+const cellSize = 20;
 let paintable = true;
 let field;
 let interval;
 
 function setup() {
-    createCanvas(canvasWidth, canvasHeight);
+    const canvas = createCanvas(canvasWidth, canvasHeight);
     //canvas id: #defaultCanvas0
     frameRate(80);
 
@@ -37,7 +37,7 @@ function setup() {
         
     });
 
-    document.getElementById("clear").addEventListener("click", function () {
+    document.getElementById("clean").addEventListener("click", function () {
         document.getElementById("start").innerHTML = "start";
         clearInterval(interval);
         interval = undefined;
@@ -84,7 +84,7 @@ function mouseClicked() {
     let drawY = Math.floor(mouseY / cellSize);
 
     let drawCell = field.cellArray[drawY][drawX];
-    console.log(drawCell.alive);
+    //console.log(drawCell.alive);
 }
 
 function generateField() {

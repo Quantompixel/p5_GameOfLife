@@ -1,25 +1,27 @@
 body {
     margin: 0;
     padding: 0;
-    overflow: scroll;
+    overflow: hidden;
     display: flex;
     justify-content: center;
 }
 
 #defaultCanvas0 {
-    border-style: solid;
+    height: 300px;
+    width: 500px;
+    /*overflow: auto;*/
 }
 
-#paint {
+nav {
     position: fixed;
+    width: 100%;
+    height: 10vh;
+    display: flex;
+    justify-content: center;
 }
 
-#start {
-    position: fixed;
-    left: 10px;
-}
-
-#clear{
-    position: fixed;
-    left: 70px;
+.controlButton {
+    height: 5em;
+    width: 5em;
+    margin: 0.5vh 1vw;
 }
