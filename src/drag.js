@@ -1,6 +1,5 @@
 //canvas id: #defaultCanvas0
-
-const canvas = document.getElementsByTagName("canvas")[0];
+let canvas;
 
 let startY;
 let startX;
@@ -8,10 +7,20 @@ let scrollLeft;
 let scrollTop;
 let isDown;
 
-canvas.addEventListener('mousedown', e => mouseIsDown(e));
-canvas.addEventListener('mouseup', e => mouseUp(e))
-canvas.addEventListener('mouseleave', e => mouseLeave(e));
-canvas.addEventListener('mousemove', e => mouseMove(e));
+window.onload = function () {
+    canvas = document.getElementById("defaultCanvas0");
+
+    init();
+}
+
+
+function init () {
+    canvas.addEventListener('mousedown', e => mouseIsDown(e));
+    canvas.addEventListener('mouseup', e => mouseUp(e))
+    canvas.addEventListener('mouseleave', e => mouseLeave(e));
+    canvas.addEventListener('mousemove', e => mouseMove(e));
+}
+
 
 function mouseIsDown(e) {
     isDown = true;
@@ -22,13 +31,15 @@ function mouseIsDown(e) {
 }
 
 function mouseUp(e) {
-    console.log("up");
+    //console.log("up");
     isDown = false;
+    canvas.style.cursor = "default";
 }
 
 function mouseLeave(e) {
-    console.log("leave");
+    //console.log("leave");
     isDown = false;
+    canvas.style.cursor = "default";
 }
 
 function mouseMove(e) {
@@ -36,14 +47,16 @@ function mouseMove(e) {
     if (isDown) {
         e.preventDefault();
         //Move vertcally
-        const y = e.pageY - container.offsetTop;
+        const y = e.pageY - canvas.offsetTop;
         const walkY = y - startY;
-        canvas.scrollTop = scrollTop - walkY;
+        //canvas.scrollTop = scrollTop - walkY;
 
         //Move Horizontally
-        const x = e.pageX - container.offsetLeft;
+        const x = e.pageX - canvas.offsetLeft;
         const walkX = x - startX;
-        canvas.scrollLeft = scrollLeft - walkX;
-
+        //canvas.scrollLeft = scrollLeft - walkX;
+        
+        window.scrollBy(scrollLeft - walkX, scrollTop - walkY);
+        canvas.style.cursor = "grab";
     }
 }
