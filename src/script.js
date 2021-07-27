@@ -1,8 +1,8 @@
-const canvasWidth = 2000;
-const canvasHeight = 2000;
+const canvasWidth = innerWidth * 3;
+const canvasHeight = innerHeight * 2;
 
 const cellSize = 20;
-let paintable = true;
+//let paintable = true;
 let field;
 let interval;
 
@@ -17,16 +17,11 @@ function setup() {
         event.preventDefault();
     });
 
-    document.getElementById("paint").addEventListener("click", function () {
-        //toggles paint
-        paintable = !paintable;
-    });
-
     document.getElementById("start").addEventListener("click", function (event) {
         if (typeof interval === 'undefined') {
             interval = setInterval(function(){
                 field.update();
-            }, 50);
+            }, 100);
             event.target.innerHTML = "stop";
         }else{
             clearInterval(interval);
@@ -158,9 +153,6 @@ function Field(width, height, cellSize) {
     this.checkNeighbours = function (x, y) {
 
         const aliveNeighbours = this.isAlive(x - 1, y - 1) + this.isAlive(x, y - 1) + this.isAlive(x + 1, y - 1) + this.isAlive(x - 1, y) + this.isAlive(x + 1, y) + this.isAlive(x - 1, y + 1) + this.isAlive(x, y + 1) + this.isAlive(x + 1, y + 1);
-
-        fill(255, 0, 0);
-        text(aliveNeighbours, x * 10, y * 10);
 
         return aliveNeighbours;
     }

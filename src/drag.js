@@ -43,7 +43,10 @@ function mouseLeave(e) {
 }
 
 function mouseMove(e) {
-    console.log("move");
+    if (!draggable) {
+        return;
+    }
+
     if (isDown) {
         e.preventDefault();
         //Move vertcally

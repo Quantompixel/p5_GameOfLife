@@ -4,17 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Game Of Life</title>
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.3.1/lib/p5.js"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/p5@1.3.1/lib/p5.js"></script>-->
     <link rel="stylesheet" href="style.css">
+    <script src="../p5/p5.min.js"></script>
 </head>
 
 <body>
     <nav>
         <button id=paint class="controlButton">paint</button>
+        <button id=drag class="controlButton">drag</button>
         <button id=start class="controlButton">start</button>
         <button id=clean class="controlButton">clear</button>
     </nav>
 
+    <script src="nav.js"></script>
     <script src="script.js"></script>
     <script src="drag.js"></script>
 </body>
