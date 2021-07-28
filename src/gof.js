@@ -1,5 +1,5 @@
 const canvasWidth = innerWidth * 3;
-const canvasHeight = innerHeight * 2;
+const canvasHeight = innerHeight * 4;
 
 const cellSize = 20;
 //let paintable = true;
@@ -21,7 +21,7 @@ function setup() {
         if (typeof interval === 'undefined') {
             interval = setInterval(function(){
                 field.update();
-            }, 100);
+            }, 50);
             event.target.innerHTML = "stop";
         }else{
             clearInterval(interval);
@@ -111,6 +111,7 @@ function Field(width, height, cellSize) {
                 const cell = this.cellArray[i][k];
 
                 const aliveNeighbours = this.checkNeighbours(cell.x, cell.y);
+                cell.aliveNeighbours = aliveNeighbours;
 
 
                 if (cell.alive) {
@@ -137,12 +138,17 @@ function Field(width, height, cellSize) {
             for (let k = 0; k < this.cellArray[i].length; k++) {
                 const cell = this.cellArray[i][k];
 
+                //optimization: only looks at cells that is has to
+                if (cell.alive == false && cell.aliveNeighbours == 0) {
+                    continue;
+                }
+
                 if (cell.futureState) {
                     fill(0);
-                    rect(cell.x * cell.cellSize, cell.y * cell.cellSize, cell.cellSize, cell.cellSize);
+                    rect(cell.x * cell.cellSize, cell.y * cell.cellSize, cell.cellSize-1, cell.cellSize-1);
                 } else {
                     fill(255);
-                    rect(cell.x * cell.cellSize, cell.y * cell.cellSize, cell.cellSize, cell.cellSize);
+                    rect(cell.x * cell.cellSize, cell.y * cell.cellSize, cell.cellSize-1, cell.cellSize-1);
                 }
 
                 cell.alive = cell.futureState;
@@ -173,6 +179,7 @@ function Cell(field, x, y, cellSize, alive, futureState) {
     this.cellSize = cellSize;
     this.alive = alive;
     this.futureState = futureState;
+    this.aliveNeighbours = 0;
 
     this.init = function () {
         stroke(0, 0, 0, 50);
@@ -188,13 +195,13 @@ function Cell(field, x, y, cellSize, alive, futureState) {
     }
 
     this.updateColor = function (alive) {
-        stroke(0, 0, 0, 50);
+        //stroke(0, 0, 0, 50);
         if (alive) {
             fill(0);
         } else {
             fill(255);
         }
 
-        rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize, this.cellSize);
+        rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize-1, this.cellSize-1);
     }
 }
