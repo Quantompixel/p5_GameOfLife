@@ -25,3 +25,7 @@ nav {
     width: 5em;
     margin: 0.5vh 1vw;
 }
+
+.active {
+    background-color: lime;
+}

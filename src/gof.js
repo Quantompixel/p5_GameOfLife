@@ -13,23 +13,25 @@ function setup() {
 
     generateField();
 
-    document.getElementById("defaultCanvas0").addEventListener("contextmenu", function(event){
+    document.getElementById("defaultCanvas0").addEventListener("contextmenu", function (event) {
         event.preventDefault();
     });
 
     document.getElementById("start").addEventListener("click", function (event) {
         if (typeof interval === 'undefined') {
-            interval = setInterval(function(){
+            interval = setInterval(function () {
                 field.update();
             }, 50);
             event.target.innerHTML = "stop";
-        }else{
+            document.getElementById("start").classList.add("active");
+        } else {
             clearInterval(interval);
             interval = undefined;
             event.target.innerHTML = "start";
+            document.getElementById("start").classList.remove("active");
         }
 
-        
+
     });
 
     document.getElementById("clean").addEventListener("click", function () {
@@ -38,6 +40,64 @@ function setup() {
         interval = undefined;
         field.init();
     });
+}
+
+let xStart;
+let yStart;
+
+function keyPressed() {
+    if (keyCode === 16) { //Shift
+        xStart = mouseX;
+        yStart = mouseY;
+    }
+}
+
+function keyReleased() {
+    if (keyCode === 16) { //Shift
+        if (!paintable) {
+            return;
+        }
+
+        xStart = +Math.floor(xStart).toFixed(0);
+        yStart = +Math.floor(yStart).toFixed(0);
+
+        let xEnd = +Math.floor(mouseX).toFixed(0);
+        let yEnd = +Math.floor(mouseY).toFixed(0);
+
+        const deltaX = xEnd - xStart;
+        const deltaY = yEnd - yStart;
+
+        const k = deltaX === 0
+            ? 1
+            : deltaY / deltaX;
+
+        const d = yStart - k * xStart;
+
+        if (xEnd < xStart) {
+            const s1 = xStart;
+            const e1 = xEnd;
+            xEnd = Math.max(s1, e1);
+            xStart = Math.min(s1, e1);
+        }
+
+        while (xStart < xEnd) {
+            let cellY = k * xStart + d;
+
+            let drawX = Math.floor(xStart / cellSize);
+            let drawY = Math.floor(cellY / cellSize);
+
+            let drawCell = field.cellArray[drawY][drawX];
+            if (typeof drawCell === 'undefined') {
+                return;
+            }
+
+            drawCell.alive = true;
+            drawCell.updateColor(true);
+
+            //good fix
+            xStart += .1;
+        }
+    }
 }
 
 function draw() {
@@ -145,10 +205,10 @@ function Field(width, height, cellSize) {
 
                 if (cell.futureState) {
                     fill(0);
-                    rect(cell.x * cell.cellSize, cell.y * cell.cellSize, cell.cellSize-1, cell.cellSize-1);
+                    rect(cell.x * cell.cellSize, cell.y * cell.cellSize, cell.cellSize - 1, cell.cellSize - 1);
                 } else {
                     fill(255);
-                    rect(cell.x * cell.cellSize, cell.y * cell.cellSize, cell.cellSize-1, cell.cellSize-1);
+                    rect(cell.x * cell.cellSize, cell.y * cell.cellSize, cell.cellSize - 1, cell.cellSize - 1);
                 }
 
                 cell.alive = cell.futureState;
@@ -202,6 +262,6 @@ function Cell(field, x, y, cellSize, alive, futureState) {
             fill(255);
         }
 
-        rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize-1, this.cellSize-1);
+        rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize - 1, this.cellSize - 1);
     }
 }
