@@ -2,7 +2,6 @@ const canvasWidth = innerWidth * 3;
 const canvasHeight = innerHeight * 4;
 
 const cellSize = 20;
-//let paintable = true;
 let field;
 let interval;
 
@@ -13,23 +12,23 @@ function setup() {
 
     generateField();
 
-    document.getElementById("defaultCanvas0").addEventListener("contextmenu", function(event){
+    document.getElementById("defaultCanvas0").addEventListener("contextmenu", function (event) {
         event.preventDefault();
     });
 
     document.getElementById("start").addEventListener("click", function (event) {
         if (typeof interval === 'undefined') {
-            interval = setInterval(function(){
+            interval = setInterval(function () {
                 field.update();
             }, 50);
             event.target.innerHTML = "stop";
-        }else{
+        } else {
             clearInterval(interval);
             interval = undefined;
             event.target.innerHTML = "start";
         }
 
-        
+
     });
 
     document.getElementById("clean").addEventListener("click", function () {
@@ -80,6 +79,14 @@ function mouseClicked() {
 
     let drawCell = field.cellArray[drawY][drawX];
     //console.log(drawCell.alive);
+}
+
+function updateInterval(clock) {
+    clearInterval(interval);
+    interval = undefined;
+    interval = setInterval(function () {
+        field.update();
+    }, clock);
 }
 
 function generateField() {
@@ -145,10 +152,10 @@ function Field(width, height, cellSize) {
 
                 if (cell.futureState) {
                     fill(0);
-                    rect(cell.x * cell.cellSize, cell.y * cell.cellSize, cell.cellSize-1, cell.cellSize-1);
+                    rect(cell.x * cell.cellSize, cell.y * cell.cellSize, cell.cellSize - 1, cell.cellSize - 1);
                 } else {
                     fill(255);
-                    rect(cell.x * cell.cellSize, cell.y * cell.cellSize, cell.cellSize-1, cell.cellSize-1);
+                    rect(cell.x * cell.cellSize, cell.y * cell.cellSize, cell.cellSize - 1, cell.cellSize - 1);
                 }
 
                 cell.alive = cell.futureState;
@@ -202,6 +209,6 @@ function Cell(field, x, y, cellSize, alive, futureState) {
             fill(255);
         }
 
-        rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize-1, this.cellSize-1);
+        rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize - 1, this.cellSize - 1);
     }
 }
