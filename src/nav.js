@@ -31,3 +31,19 @@ document.getElementById("interval").addEventListener("input", function (event) {
     updateInterval(Math.floor(event.target.value / 100 * 50));
     //console.log(interval);
 });
+
+//disables paint when hovering buttons
+const controlButtons = document.querySelectorAll("nav .controlButton");
+controlButtons.forEach(element => {
+    let before = paintable;
+
+    element.addEventListener("mouseenter", () => {
+        paintable = false;
+    });
+
+    //element.addEventListener("mouseleave", (event) => {
+    //    paintable = before;
+    //});
+});
+
+console.log(controlButtons[0]);
