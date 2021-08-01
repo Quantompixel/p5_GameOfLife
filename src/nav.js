@@ -1,4 +1,4 @@
-let paintable = false;
+let paintable = true;
 let draggable = false;
 
 document.getElementById("paint").addEventListener("click", function () {
@@ -6,10 +6,23 @@ document.getElementById("paint").addEventListener("click", function () {
     paintable = !paintable;
     
     draggable = false;
+
+    document.getElementById("drag").classList.remove("active");
+    document.getElementById("paint").classList.remove("active");
+
+    if (paintable) {
+        document.getElementById("paint").classList.add("active");
+    }
 });
 
 document.getElementById("drag").addEventListener("click", function() {
     draggable = !draggable;
     paintable = false;
+
+    document.getElementById("paint").classList.remove("active");
+    document.getElementById("drag").classList.remove("active");
+    if (draggable) {
+        document.getElementById("drag").classList.add("active");
+    }
 });
 
