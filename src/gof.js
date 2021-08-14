@@ -10,35 +10,12 @@ function setup() {
     //canvas id: #defaultCanvas0
     frameRate(80);
 
-    generateField();
-
     document.getElementById("defaultCanvas0").addEventListener("contextmenu", function (event) {
         event.preventDefault();
     });
 
-    document.getElementById("start").addEventListener("click", function (event) {
-        if (typeof interval === 'undefined') {
-            interval = setInterval(function () {
-                field.update();
-            }, 50);
-            event.target.innerHTML = "stop";
-            document.getElementById("start").classList.add("active");
-        } else {
-            clearInterval(interval);
-            interval = undefined;
-            event.target.innerHTML = "start";
-            document.getElementById("start").classList.remove("active");
-        }
-
-
-    });
-
-    document.getElementById("clean").addEventListener("click", function () {
-        document.getElementById("start").innerHTML = "start";
-        clearInterval(interval);
-        interval = undefined;
-        field.init();
-    });
+    field = new Field(canvasWidth, canvasHeight, cellSize);
+    field.init();
 }
 
 let xStart;
@@ -139,19 +116,6 @@ function mouseClicked() {
 
     let drawCell = field.cellArray[drawY][drawX];
     //console.log(drawCell.alive);
-}
-
-function updateInterval(clock) {
-    clearInterval(interval);
-    interval = undefined;
-    interval = setInterval(function () {
-        field.update();
-    }, clock);
-}
-
-function generateField() {
-    field = new Field(canvasWidth, canvasHeight, cellSize);
-    field.init();
 }
 
 function Field(width, height, cellSize) {

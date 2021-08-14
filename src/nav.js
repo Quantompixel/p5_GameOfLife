@@ -1,6 +1,10 @@
 let paintable = true;
 let draggable = false;
 
+const timer = new Interval(500, () => {
+    field.update();
+});
+
 document.getElementById("paint").addEventListener("click", function () {
     //toggles paint
     paintable = !paintable;
@@ -26,11 +30,25 @@ document.getElementById("drag").addEventListener("click", function () {
     }
 });
 
-document.getElementById("interval").addEventListener("input", function (event) {
-    //console.log(Math.floor(event.target.value / 100 * 50));
-    updateInterval(Math.floor(event.target.value / 100 * 50));
-    //console.log(interval);
+document.getElementById("clean").addEventListener("click", function () {
+    document.getElementById("start").innerHTML = "start";
+    timer.stop();
+    field.init();
 });
+
+document.getElementById("start").addEventListener("click", function (event) {
+    if (timer.running === false) {
+        timer.start();
+    } else {
+        timer.stop();
+    }
+});
+
+document.getElementById("interval").addEventListener("mouseup", function (event) {
+    console.log(event.target.value);
+    timer.updateTimeout(event.target.value);
+});
+
 
 //disables paint when hovering buttons
 const controlButtons = document.querySelectorAll("nav .controlButton");
@@ -40,10 +58,35 @@ controlButtons.forEach(element => {
     element.addEventListener("mouseenter", () => {
         paintable = false;
     });
-
-    //element.addEventListener("mouseleave", (event) => {
-    //    paintable = before;
-    //});
 });
 
-console.log(controlButtons[0]);
+
+function Interval(interval, func) {
+    this.interval = interval;
+    this.func = func;
+    this.running = false;
+
+    this.timeout = () => {
+        if (this.running === true) {
+            setTimeout((this.loop), this.interval);
+        }
+    }
+
+    this.loop = () => {
+        this.func();
+        this.timeout();
+    }
+
+    this.start = () => {
+        this.running = true;
+        this.loop();
+    }
+
+    this.stop = () => {
+        this.running = false;
+    }
+
+    this.updateTimeout = (interval) => {
+        this.interval = interval;
+    }
+}
