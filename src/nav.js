@@ -1,51 +1,66 @@
 let paintable = true;
 let draggable = false;
 
-const timer = new Interval(500, () => {
+const paint = document.getElementById("paint");
+const drag = document.getElementById("drag");
+const start = document.getElementById("start");
+const clean = document.getElementById("clean");
+const slider = document.getElementById("slider");
+
+const timer = new Interval(30, () => {
     field.update();
 });
 
-document.getElementById("paint").addEventListener("click", function () {
-    //toggles paint
-    paintable = !paintable;
+paint.addEventListener("click", () => {
+    //toggles painting
+    if (paint.classList.contains("active")) {
+        paintable = false;
 
-    draggable = false;
+        paint.classList.remove("active");
+    } else {
+        paintable = true;
+        draggable = false;
 
-    document.getElementById("drag").classList.remove("active");
-    document.getElementById("paint").classList.remove("active");
-
-    if (paintable) {
-        document.getElementById("paint").classList.add("active");
+        paint.classList.add("active");
+        drag.classList.remove("active");
     }
 });
 
-document.getElementById("drag").addEventListener("click", function () {
-    draggable = !draggable;
-    paintable = false;
+drag.addEventListener("click", () => {
+    //toggles dragging
+    if (drag.classList.contains("active")) {
+        draggable = false;
 
-    document.getElementById("paint").classList.remove("active");
-    document.getElementById("drag").classList.remove("active");
-    if (draggable) {
-        document.getElementById("drag").classList.add("active");
+        drag.classList.remove("active");
+    } else {
+        draggable = true;
+        paintable = false;
+
+        drag.classList.add("active");
+        paint.classList.remove("active");
     }
 });
 
-document.getElementById("clean").addEventListener("click", function () {
-    document.getElementById("start").innerHTML = "start";
+clean.addEventListener("click", () => {
+    start.innerHTML = "start";
     timer.stop();
     field.init();
 });
 
-document.getElementById("start").addEventListener("click", function (event) {
+start.addEventListener("click", () => {
     if (timer.running === false) {
         timer.start();
+
+        start.classList.add("active");
     } else {
         timer.stop();
+
+        start.classList.remove("active");
     }
 });
 
-document.getElementById("interval").addEventListener("mouseup", function (event) {
-    console.log(event.target.value);
+slider.addEventListener("input", function (event) {
+    //console.log(event.target.value);
     timer.updateTimeout(event.target.value);
 });
 
