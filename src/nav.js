@@ -59,7 +59,7 @@ start.addEventListener("click", () => {
     }
 });
 
-slider.addEventListener("input", function (event) {
+slider.addEventListener("input", (event) => {
     //console.log(event.target.value);
     timer.updateTimeout(event.target.value);
 });

@@ -2,8 +2,8 @@ const canvasWidth = innerWidth * 3;
 const canvasHeight = innerHeight * 4;
 
 const cellSize = 20;
+
 let field;
-let interval;
 
 function setup() {
     const canvas = createCanvas(canvasWidth, canvasHeight);
@@ -77,6 +77,7 @@ function keyReleased() {
 }
 
 function draw() {
+// normal draw
     if (mouseIsPressed && paintable) {
         let drawX = Math.floor(mouseX / cellSize);
         let drawY = Math.floor(mouseY / cellSize);
