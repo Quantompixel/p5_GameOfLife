@@ -238,9 +238,7 @@ function Field(width, height, cellSize) {
             return false;
         }
 
-        return this.cellArray[y][x].alive
-            ? 1
-            : 0;
+        return this.cellArray[y][x].alive ? 1 : 0;
     }
 }
 
@@ -275,5 +273,15 @@ function Cell(field, x, y, cellSize, alive, futureState) {
         }
 
         rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize - 1, this.cellSize - 1);
+    }
+
+    this.highlight = function () {
+        noStroke();
+        fill(220);
+        rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize - 1, this.cellSize - 1);
+    }
+
+    this.cancelHighlight = function () {
+        this.updateColor(this.alive);
     }
 }
