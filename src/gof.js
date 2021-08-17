@@ -45,9 +45,9 @@ function keyReleased() {
         const deltaX = xEnd - xStart;
         const deltaY = yEnd - yStart;
 
-        const k = deltaX === 0
-            ? 1
-            : deltaY / deltaX;
+        const k = deltaX === 0 ?
+            1 :
+            deltaY / deltaX;
 
         const d = yStart - k * xStart;
 
@@ -79,7 +79,7 @@ function keyReleased() {
 }
 
 function draw() {
-// normal draw
+    // normal draw
     if (mouseIsPressed && paintable) {
         let drawX = Math.floor(mouseX / cellSize);
         let drawY = Math.floor(mouseY / cellSize);
@@ -237,5 +237,14 @@ function Cell(field, x, y, cellSize, alive, futureState) {
         }
 
         rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize - 1, this.cellSize - 1);
+    }
+
+    this.highlight = function () {
+        fill(255, 0, 0);
+        rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize - 1, this.cellSize - 1);
+    }
+
+    this.cancelHighlight = function () {
+        this.updateColor(this.alive);
     }
 }
