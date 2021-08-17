@@ -1,3 +1,5 @@
+//buildmenu
+
 const canvasWidth = innerWidth * 3;
 const canvasHeight = innerHeight * 4;
 
