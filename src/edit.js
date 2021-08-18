@@ -1,6 +1,8 @@
 let highlightedCells = [];
 
+let normalDraw = true;
 let lineDrawing = false;
+let patterDrawing = false;
 
 // #Pattern
 const testPattern = [
@@ -10,29 +12,28 @@ const testPattern = [
 ];
 
 function keyTyped() {
+    // activate normal draw
+    if (key === 'p') {
+        patterDrawing = false;
+        lineDrawing = false;
+
+        normalDraw = !normalDraw;
+    }
+
+    // activate pattern drawing
     if (key === 'f') {
-        // console.log("typed");
-        const gridX = Math.floor(mouseX / cellSize);
-        const gridY = Math.floor(mouseY / cellSize);
+        normalDraw = false;
+        lineDrawing = false;
 
-        for (let i = 0; i < testPattern.length; i++) {
-            for (let j = 0; j < testPattern[i].length; j++) {
-                // read pattern
-                if (testPattern[i][j] == 0) {
-                    continue;
-                }
-
-                // draw pattern on canvas
-                const element = field.cellArray[gridY + i][gridX + j];
-                element.highlight();
-            }
-        }
+        patterDrawing = !patterDrawing;
     }
 
     // activate line drawing
     if (key === 'l') {
+        normalDraw = false;
+        patterDrawing = false;
+
         lineDrawing = !lineDrawing;
-        paintable = !paintable;
     }
 }
 
@@ -47,17 +48,49 @@ function draw() {
     })
     highlightedCells = [];
 
+    //--> calculates the cell which the mouse is hovering
+    const drawX = Math.floor(mouseX / cellSize);
+    const drawY = Math.floor(mouseY / cellSize);
+
+    const drawCell = field.cellArray[drawY][drawX];
+
+
+    // # PATTERN
+    // - prebuild patterns can be placed
+    // - LMB to place selected pattern#
+
+    if (patterDrawing) {
+        // highlighting
+        for (let i = 0; i < testPattern.length; i++) {
+            for (let j = 0; j < testPattern[i].length; j++) {
+                // read pattern
+                if (testPattern[i][j] == 0) {
+                    continue;
+                }
+
+                // highlight pattern on canvas
+                const element = field.cellArray[drawY + i][drawX + j];
+                element.highlight();
+                highlightedCells.push(element);
+            }
+
+        }
+
+        // draw pattern
+        if (mouseIsPressed) {
+            //draws the highlighted thing on the canvas
+            drawHighlightedCells();
+        }
+    }
+
+
 
     // # NORMAL
     // - freehand drawing
     // - LMB to draw 
     // - RMB to erase
 
-    if (mouseIsPressed && paintable) {
-        let drawX = Math.floor(mouseX / cellSize);
-        let drawY = Math.floor(mouseY / cellSize);
-
-        let drawCell = field.cellArray[drawY][drawX];
+    if (mouseIsPressed && normalDraw) {
         if (typeof drawCell === 'undefined') {
             return;
         }
@@ -109,11 +142,7 @@ function draw() {
         drawLine(xLineStart, yLineStart, xEnd, yEnd);
 
         // makes the last drawn line permanent  
-        highlightedCells.forEach((cell) => {
-            cell.alive = true;
-            cell.updateColor(true);
-        });
-        highlightedCells = [];
+        drawHighlightedCells();
 
         xLineStart = 0;
         yLineStart = 0;
@@ -154,4 +183,12 @@ function drawLine(xStart, yStart, xEnd, yEnd) {
         // good fix
         xStart += .1;
     }
+}
+
+function drawHighlightedCells() {
+    highlightedCells.forEach((cell) => {
+        cell.alive = true;
+        cell.updateColor(true);
+    });
+    highlightedCells = [];
 }
