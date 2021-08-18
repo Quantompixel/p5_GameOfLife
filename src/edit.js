@@ -2,38 +2,38 @@ let highlightedCells = [];
 
 let normalDraw = true;
 let lineDrawing = false;
-let patterDrawing = false;
+let patternDrawing = false;
 
 // #Pattern
-const testPattern = [
+const glider = [
     [0, 0, 1],
     [1, 0, 1],
     [0, 1, 1]
 ];
 
+
 function keyTyped() {
-    // activate normal draw
-    if (key === 'p') {
-        patterDrawing = false;
-        lineDrawing = false;
+    switch (key) {
+        case 'p':
+            // activate normal draw
+            patternDrawing = false;
+            lineDrawing = false;
+            normalDraw = !normalDraw;
+            break;
 
-        normalDraw = !normalDraw;
-    }
+        case 'f':
+            // activate pattern drawing
+            normalDraw = false;
+            lineDrawing = false;
+            patternDrawing = !patternDrawing;
+            break;
 
-    // activate pattern drawing
-    if (key === 'f') {
-        normalDraw = false;
-        lineDrawing = false;
-
-        patterDrawing = !patterDrawing;
-    }
-
-    // activate line drawing
-    if (key === 'l') {
-        normalDraw = false;
-        patterDrawing = false;
-
-        lineDrawing = !lineDrawing;
+        case 'l':
+            // activate line drawing
+            normalDraw = false;
+            patternDrawing = false;
+            lineDrawing = !lineDrawing;
+            break;
     }
 }
 
@@ -48,6 +48,10 @@ function draw() {
     })
     highlightedCells = [];
 
+    if (!paintable) {
+        return;
+    }
+
     //--> calculates the cell which the mouse is hovering
     const drawX = Math.floor(mouseX / cellSize);
     const drawY = Math.floor(mouseY / cellSize);
@@ -57,24 +61,11 @@ function draw() {
 
     // # PATTERN
     // - prebuild patterns can be placed
-    // - LMB to place selected pattern#
+    // - LMB to place selected pattern
 
-    if (patterDrawing) {
+    if (patternDrawing) {
         // highlighting
-        for (let i = 0; i < testPattern.length; i++) {
-            for (let j = 0; j < testPattern[i].length; j++) {
-                // read pattern
-                if (testPattern[i][j] == 0) {
-                    continue;
-                }
-
-                // highlight pattern on canvas
-                const element = field.cellArray[drawY + i][drawX + j];
-                element.highlight();
-                highlightedCells.push(element);
-            }
-
-        }
+        drawPattern(drawX, drawY,glider);
 
         // draw pattern
         if (mouseIsPressed) {
@@ -146,6 +137,23 @@ function draw() {
 
         xLineStart = 0;
         yLineStart = 0;
+    }
+}
+
+function drawPattern(x,y,array2D) {
+    for (let i = 0; i < array2D.length; i++) {
+        for (let j = 0; j < array2D[i].length; j++) {
+            // read pattern
+            if (glider[i][j] == 0) {
+                continue;
+            }
+
+            // highlight pattern on canvas
+            const element = field.cellArray[y + i][x + j];
+            element.highlight();
+            highlightedCells.push(element);
+        }
+
     }
 }
 
