@@ -68,10 +68,14 @@ slider.addEventListener("input", (event) => {
 //disables paint when hovering buttons
 const controlButtons = document.querySelectorAll("nav .controlButton");
 controlButtons.forEach(element => {
-    let before = paintable;
-
     element.addEventListener("mouseenter", () => {
         paintable = false;
+    });
+
+    element.addEventListener("mouseout", () => {
+        if (paint.classList.contains("active")) {
+            paintable = true;
+        }
     });
 });
 
