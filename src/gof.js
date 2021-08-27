@@ -161,4 +161,7 @@ function Cell(field, x, y, cellSize, alive, futureState) {
     this.cancelHighlight = function () {
         this.updateColor(this.alive);
     }
+    this.toString = () => {
+        return `Cell{alive:${this.alive}, x:${this.x}, y: ${this.y}, aliveNeighbours: ${this.aliveNeighbours}`
+    }
 }

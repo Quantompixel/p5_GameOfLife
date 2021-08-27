@@ -43,8 +43,8 @@ const functions = [formFunction, lineFunction]
  * @returns {boolean} whether or not to clear the highlighted cells
  */
 function defaultShouldClearHighlight() {
-    const lastCell = getCell(pmouseY, pmouseX)
-    const currentCell = getCell(mouseY, mouseX)
+    const lastCell = getCellFromScreenPosition(pmouseY, pmouseX)
+    const currentCell = getCellFromScreenPosition(mouseY, mouseX)
     return !(lastCell.y === currentCell.y && lastCell.x === currentCell.x);
 }
 
@@ -146,7 +146,7 @@ function mouseDragged() {
     }
     if (!overwrittenBySpecialFunction) {
         if (paintable) {
-            const drawCell = getCell(mouseY, mouseX)
+            const drawCell = getCellFromScreenPosition(mouseY, mouseX)
             if (typeof drawCell !== 'undefined') {
                 // - LMB to draw
                 // - RMB to erase
@@ -179,11 +179,42 @@ function draw() {
 }
 
 function drawLine(xStart, yStart, xEnd, yEnd) {
-    const startCell = getCell(yStart, xStart)
-    const endcell = getCell(yEnd, xEnd)
+    let startCell = getCellFromScreenPosition(yStart, xStart)
+    let endCell = getCellFromScreenPosition(yEnd, xEnd)
+    const minCellY = Math.floor(Math.min(yStart, yEnd) / cellSize)
+    const maxCellY = Math.floor(Math.max(yStart, yEnd) / cellSize)
+    if (startCell.x > endCell.x) {
+        [startCell, endCell] = [endCell, startCell]
+    }
+
+    const deltaY = endCell.y - startCell.y
+    const deltaX = endCell.x - startCell.x
+
+    if (deltaX === 0) {
+        for (let cellY = minCellY; cellY <= maxCellY; cellY++) {
+            highlight(getCellFromIndex(cellY, startCell.x))
+        }
+    } else {
+        const yIncrementPerCell = deltaY / deltaX
+        for (let x = 0, y = startCell.y; x <= deltaX; x++, y += yIncrementPerCell) {
+            //Simple: not more than one cell on the y axis
+            if (Math.abs(yIncrementPerCell) <= 1) {
+                highlight(getCellFromIndex(Math.floor(y), startCell.x + x))
+            } else {
+                let start = y - yIncrementPerCell
+                let end = y
+                if (start > end) {
+                    [start, end] = [end, start]
+                }
+                for (let cellY = start; cellY <= end && cellY >= minCellY && cellY <= maxCellY; cellY++) {
+                    highlight(getCellFromIndex(Math.floor(cellY), startCell.x + x))
+                }
+            }
+        }
+    }
 
     highlight(startCell)
-    highlight(endcell)
+    highlight(endCell)
 }
 
 /**
@@ -197,11 +228,26 @@ function highlight(cell) {
 /**
  * Returns the cell with the given coordinates on screen
  * @param {Number} yPos the Cells y position
- * @param {Number} xPos the Cells x postition
+ * @param {Number} xPos the Cells x position
  * @returns {Cell} the cell
  */
-function getCell(yPos, xPos) {
+function getCellFromScreenPosition(yPos, xPos) {
     return field.cellArray[Math.floor(yPos / cellSize)][Math.floor(xPos / cellSize)];
+}
+
+/**
+ * Returns the cell with the given indexes
+ * @param {Number} yPos the Cells y index
+ * @param {Number} xPos the Cells x index
+ * @returns {Cell} the cell
+ */
+function getCellFromIndex(yPos, xPos) {
+    const col = field.cellArray[yPos];
+    if (col) {
+        return col[xPos]
+    } else {
+        return undefined
+    }
 }
 
 function makeHighlightsPermanent() {
