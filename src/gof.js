@@ -18,6 +18,22 @@ function setup() {
     field.init();
 }
 
+
+function mouseClicked() {
+    if (mouseX < 0 || mouseY < 0) {
+        return;
+    }
+    if (mouseX > canvasWidth || mouseY > canvasHeight) {
+        return;
+    }
+
+    let drawX = Math.floor(mouseX / cellSize);
+    let drawY = Math.floor(mouseY / cellSize);
+
+    let drawCell = field.cellArray[drawY][drawX];
+    //console.log(drawCell.alive);
+}
+
 function Field(width, height, cellSize) {
     this.cellArray = [];
 
@@ -144,5 +160,8 @@ function Cell(field, x, y, cellSize, alive, futureState) {
 
     this.cancelHighlight = function () {
         this.updateColor(this.alive);
+    }
+    this.toString = () => {
+        return `Cell{alive:${this.alive}, x:${this.x}, y: ${this.y}, aliveNeighbours: ${this.aliveNeighbours}`
     }
 }

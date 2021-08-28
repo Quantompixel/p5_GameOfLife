@@ -1,202 +1,258 @@
 let highlightedCells = [];
 
-let normalDraw = true;
 let lineDrawing = false;
-let patternDrawing = false;
 
 // #Pattern
-const glider = [
+const testPattern = [
     [0, 0, 1],
     [1, 0, 1],
     [0, 1, 1]
 ];
 
+const formFunction = new ActivatingSpecialFunction('f', () => {
+    // console.log("typed");
+    const gridX = Math.floor(mouseX / cellSize);
+    const gridY = Math.floor(mouseY / cellSize);
 
-function keyTyped() {
-    switch (key) {
-        case 'p':
-            // activate normal draw
-            patternDrawing = false;
-            lineDrawing = false;
-            normalDraw = !normalDraw;
-            break;
-
-        case 'f':
-            // activate pattern drawing
-            normalDraw = false;
-            lineDrawing = false;
-            patternDrawing = !patternDrawing;
-            break;
-
-        case 'l':
-            // activate line drawing
-            normalDraw = false;
-            patternDrawing = false;
-            lineDrawing = !lineDrawing;
-            break;
-    }
-}
-
-let mouseReleased = false;
-let xLineStart = 0;
-let yLineStart = 0;
-
-function draw() {
-    //--> clears all highlighted cells
-    highlightedCells.forEach((cell) => {
-        cell.cancelHighlight();
-    })
-    highlightedCells = [];
-
-    if (!paintable) {
-        return;
-    }
-
-    //--> calculates the cell which the mouse is hovering
-    const drawX = Math.floor(mouseX / cellSize);
-    const drawY = Math.floor(mouseY / cellSize);
-
-    const drawCell = field.cellArray[drawY][drawX];
-
-
-    // # PATTERN
-    // - prebuild patterns can be placed
-    // - LMB to place selected pattern
-
-    if (patternDrawing) {
-        // highlighting
-        drawPattern(drawX, drawY,glider);
-
-        // draw pattern
-        if (mouseIsPressed) {
-            //draws the highlighted thing on the canvas
-            drawHighlightedCells();
-        }
-    }
-
-
-
-    // # NORMAL
-    // - freehand drawing
-    // - LMB to draw 
-    // - RMB to erase
-
-    if (mouseIsPressed && normalDraw) {
-        if (typeof drawCell === 'undefined') {
-            return;
-        }
-
-        if (mouseButton === LEFT) {
-            if (drawCell.alive === true) {
-                return;
-            } else {
-                drawCell.changeState();
-            }
-        }
-        if (mouseButton === RIGHT) {
-            if (drawCell.alive === false) {
-                return;
-            } else {
-                drawCell.changeState();
-            }
-        }
-    }
-
-    // # LINE
-    // - creates straight lines
-    // - hold LMB to preview line
-    // - release LMB to create new line
-
-    if (mouseIsPressed && lineDrawing) {
-
-        if (xLineStart === 0) {
-            xLineStart = mouseX;
-            yLineStart = mouseY;
-        }
-
-        xLineStart = +Math.floor(xLineStart).toFixed(0);
-        yLineStart = +Math.floor(yLineStart).toFixed(0);
-
-        let xEnd = +Math.floor(mouseX).toFixed(0);
-        let yEnd = +Math.floor(mouseY).toFixed(0);
-
-        drawLine(xLineStart, yLineStart, xEnd, yEnd);
-
-        mouseReleased = false;
-
-    } else if (mouseReleased === false) {
-        mouseReleased = true; // so that it only executes once and simulates mouseReleased()
-
-        let xEnd = +Math.floor(mouseX).toFixed(0);
-        let yEnd = +Math.floor(mouseY).toFixed(0);
-
-        drawLine(xLineStart, yLineStart, xEnd, yEnd);
-
-        // makes the last drawn line permanent  
-        drawHighlightedCells();
-
-        xLineStart = 0;
-        yLineStart = 0;
-    }
-}
-
-function drawPattern(x,y,array2D) {
-    for (let i = 0; i < array2D.length; i++) {
-        for (let j = 0; j < array2D[i].length; j++) {
+    for (let i = 0; i < testPattern.length; i++) {
+        for (let j = 0; j < testPattern[i].length; j++) {
             // read pattern
-            if (glider[i][j] == 0) {
+            if (testPattern[i][j] === 0) {
                 continue;
             }
 
-            // highlight pattern on canvas
-            const element = field.cellArray[y + i][x + j];
+            // draw pattern on canvas
+            const element = field.cellArray[gridY + i][gridX + j];
             element.highlight();
-            highlightedCells.push(element);
         }
+    }
+});
 
+const lineFunction = new ToggleableSpecialFunction('l', "Line", (xStart, yStart, xEnd, yEnd) => drawLine(xStart, yStart, xEnd, yEnd));
+
+/**
+ * Special Functions that have a keybinding
+ * For example lines, forms, ...
+ * @type {ToggleableSpecialFunction[]|ActivatingSpecialFunction[]}
+ */
+const functions = [formFunction, lineFunction];
+
+/**
+ * Returns true if the highlighted cells should be recalculated and redrawn,
+ * false otherwise
+ * @returns {boolean} whether or not to clear the highlighted cells
+ */
+function defaultShouldClearHighlight() {
+    const lastCell = getCellFromScreenPosition(pmouseY, pmouseX);
+    const currentCell = getCellFromScreenPosition(mouseY, mouseX);
+    return !(lastCell.y === currentCell.y && lastCell.x === currentCell.x);
+}
+
+/**
+ * A special function that is activated once, when the key is pressed
+ * Does not highlight anything
+ * @param {String} keyBind the key that activates this function
+ * @param {Function} drawFunction a function that draws this element
+ */
+function ActivatingSpecialFunction(keyBind, drawFunction) {
+    this.keyBind = keyBind;
+    this.drawFunction = drawFunction;
+    this.update = () => {
+        this.drawFunction();
+    };
+    /**
+     * Returns whether or not to clear highlights
+     */
+    this.shouldClearHighlights = () => {
+        return defaultShouldClearHighlight();
+    };
+}
+
+/**
+ * Special function, for example a line
+ *
+ * @param {String} keyBind the key that activates this function
+ * @param {String} name the name of this function
+ * @param {Function}drawFunction a function that takes the mouse positions and draws this function
+ */
+function ToggleableSpecialFunction(keyBind, name, drawFunction) {
+    this.keyBind = keyBind;
+    this.drawFunction = drawFunction;
+    /**
+     * Is this function currently highlighting anything / is it active
+     * @type {Boolean}
+     */
+    this.highlighting = false;
+    this.xStart = undefined;
+    this.yStart = undefined;
+    /**
+     * User-friendly name of this function
+     * @type {String}
+     */
+    this.name = name;
+
+    /**
+     * Updates the highlighting value
+     */
+    this.update = () => {
+        this.highlighting = !this.highlighting;
+
+        if (this.highlighting) {
+            this.xStart = mouseX;
+            this.yStart = mouseY;
+        } else {
+            makeHighlightsPermanent();
+        }
+    };
+
+    this.mouseEvent = () => {
+        if (this.highlighting) {
+            this.drawFunction(this.xStart, this.yStart, mouseX, mouseY);
+        }
+    };
+    /**
+     * Returns whether or not to clear highlights
+     */
+    this.shouldClearHighlights = () => {
+        return defaultShouldClearHighlight();
+    };
+}
+
+
+function keyTyped() {
+    // activate line drawing
+    for (let specialFunction of functions) {
+        if (specialFunction.keyBind === key) {
+            specialFunction.update();
+        }
+    }
+}
+
+function mousePressed() {
+    for (let specialFunction of functions) {
+        if (specialFunction.mouseEvent) {
+            specialFunction.mouseEvent();
+        }
+    }
+}
+
+function mouseDragged() {
+    let overwrittenBySpecialFunction = false;
+    for (let specialFunction of functions) {
+        if (specialFunction.highlighting) {
+            specialFunction.mouseEvent();
+            overwrittenBySpecialFunction = true;
+        }
+    }
+    if (!overwrittenBySpecialFunction) {
+        if (paintable) {
+            const drawCell = getCellFromScreenPosition(mouseY, mouseX);
+            if (typeof drawCell !== 'undefined') {
+                // - LMB to draw
+                // - RMB to erase
+                drawCell.alive = mouseButton !== LEFT;
+                drawCell.changeState();
+            }
+
+        }
+    }
+}
+
+function draw() {
+    //--> clears all highlighted cells
+    if (functions.every((specialFunction) => specialFunction.shouldClearHighlights())) {
+        highlightedCells.forEach((cell) => {
+            cell.cancelHighlight();
+            highlightedCells = [];
+        });
+    }
+
+    //Displays the active functions in the paint button
+    const activeFunctionsText = functions.filter((specFunction) => specFunction.highlighting)
+        .map((specFunction) => specFunction.name)
+        .join(" ");
+    const paint = document.getElementById("paint");
+    const text = `paint<br>${activeFunctionsText}`;
+    if (paint.innerHTML !== text) {
+        paint.innerHTML = text;
     }
 }
 
 function drawLine(xStart, yStart, xEnd, yEnd) {
-    const deltaX = xEnd - xStart;
-    const deltaY = yEnd - yStart;
-
-    const k = deltaX === 0 ?
-        1 :
-        deltaY / deltaX;
-
-    const d = yStart - k * xStart;
-
-    if (xEnd < xStart) {
-        const s1 = xStart;
-        const e1 = xEnd;
-        xEnd = Math.max(s1, e1);
-        xStart = Math.min(s1, e1);
+    let startCell = getCellFromScreenPosition(yStart, xStart);
+    let endCell = getCellFromScreenPosition(yEnd, xEnd);
+    const minCellY = Math.floor(Math.min(yStart, yEnd) / cellSize);
+    const maxCellY = Math.floor(Math.max(yStart, yEnd) / cellSize);
+    if (startCell.x > endCell.x) {
+        [startCell, endCell] = [endCell, startCell];
     }
 
-    while (xStart < xEnd) {
-        let cellY = k * xStart + d;
+    const deltaY = endCell.y - startCell.y;
+    const deltaX = endCell.x - startCell.x;
 
-        let drawX = Math.floor(xStart / cellSize);
-        let drawY = Math.floor(cellY / cellSize);
-
-        let drawCell = field.cellArray[drawY][drawX];
-        if (typeof drawCell === 'undefined') {
-            return;
+    if (deltaX === 0) {
+        for (let cellY = minCellY; cellY <= maxCellY; cellY++) {
+            highlight(getCellFromIndex(cellY, startCell.x));
         }
+    } else {
+        const yIncrementPerCell = deltaY / deltaX;
+        for (let x = 0, y = startCell.y; x <= deltaX; x++, y += yIncrementPerCell) {
+            //Simple: not more than one cell on the y axis
+            if (Math.abs(yIncrementPerCell) <= 1) {
+                highlight(getCellFromIndex(Math.floor(y), startCell.x + x));
+            } else {
+                let start = y - yIncrementPerCell;
+                let end = y;
+                if (start > end) {
+                    [start, end] = [end, start];
+                }
+                for (let cellY = start; cellY <= end && cellY >= minCellY && cellY <= maxCellY; cellY++) {
+                    highlight(getCellFromIndex(Math.floor(cellY), startCell.x + x));
+                }
+            }
+        }
+    }
 
-        drawCell.highlight();
-        highlightedCells.push(drawCell);
+    highlight(startCell);
+    highlight(endCell);
+}
 
-        // good fix
-        xStart += .1;
+/**
+ * @param {Cell} cell the cell to highlight
+ */
+function highlight(cell) {
+    cell.highlight();
+    highlightedCells.push(cell);
+}
+
+/**
+ * Returns the cell with the given coordinates on screen
+ * @param {Number} yPos the Cells y position
+ * @param {Number} xPos the Cells x position
+ * @returns {Cell} the cell
+ */
+function getCellFromScreenPosition(yPos, xPos) {
+    return field.cellArray[Math.floor(yPos / cellSize)][Math.floor(xPos / cellSize)];
+}
+
+/**
+ * Returns the cell with the given indexes
+ * @param {Number} yPos the Cells y index
+ * @param {Number} xPos the Cells x index
+ * @returns {Cell} the cell
+ */
+function getCellFromIndex(yPos, xPos) {
+    const col = field.cellArray[yPos];
+    if (col) {
+        return col[xPos];
+    } else {
+        return undefined;
     }
 }
 
-function drawHighlightedCells() {
+function makeHighlightsPermanent() {
     highlightedCells.forEach((cell) => {
         cell.alive = true;
         cell.updateColor(true);
     });
-    highlightedCells = [];
 }
