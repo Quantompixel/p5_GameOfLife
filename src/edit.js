@@ -140,11 +140,11 @@ function draw() {
     }
 }
 
-function drawPattern(x,y,array2D) {
+function drawPattern(x, y, array2D) {
     for (let i = 0; i < array2D.length; i++) {
         for (let j = 0; j < array2D[i].length; j++) {
             // read pattern
-            if (glider[i][j] == 0) {
+            if (array2D[i][j] == 0) {
                 continue;
             }
 
