@@ -7,7 +7,9 @@ const start = document.getElementById("start");
 const clean = document.getElementById("clean");
 const slider = document.getElementById("slider");
 
-const timer = new Interval(30, () => {
+import * as Timer from './modules/interval.js';
+
+Timer.createInterval(30, () => {
     field.update();
 });
 
@@ -43,17 +45,17 @@ drag.addEventListener("click", () => {
 
 clean.addEventListener("click", () => {
     start.innerHTML = "start";
-    timer.stop();
+    Timer.stop();
     field.init();
 });
 
 start.addEventListener("click", () => {
-    if (timer.running === false) {
-        timer.start();
+    if (Timer.running === false) {
+        Timer.start();
 
         start.classList.add("active");
     } else {
-        timer.stop();
+        Timer.stop();
 
         start.classList.remove("active");
     }
@@ -61,7 +63,7 @@ start.addEventListener("click", () => {
 
 slider.addEventListener("input", (event) => {
     //console.log(event.target.value);
-    timer.updateTimeout(event.target.value);
+    Timer.updateTimeout(event.target.value);
 });
 
 
@@ -78,34 +80,3 @@ controlButtons.forEach(element => {
         }
     });
 });
-
-
-function Interval(interval, func) {
-    this.interval = interval;
-    this.func = func;
-    this.running = false;
-
-    this.timeout = () => {
-        if (this.running === true) {
-            setTimeout((this.loop), this.interval);
-        }
-    }
-
-    this.loop = () => {
-        this.func();
-        this.timeout();
-    }
-
-    this.start = () => {
-        this.running = true;
-        this.loop();
-    }
-
-    this.stop = () => {
-        this.running = false;
-    }
-
-    this.updateTimeout = (interval) => {
-        this.interval = interval;
-    }
-}
