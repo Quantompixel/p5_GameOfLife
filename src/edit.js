@@ -1,3 +1,6 @@
+let paintable = true;
+let draggable = false;
+
 let highlightedCells = [];
 
 let lineDrawing = false;

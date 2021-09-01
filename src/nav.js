@@ -1,6 +1,3 @@
-let paintable = true;
-let draggable = false;
-
 const paint = document.getElementById("paint");
 const drag = document.getElementById("drag");
 const start = document.getElementById("start");
