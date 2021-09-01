@@ -18,7 +18,7 @@ paint.addEventListener("click", () => {
         paint.classList.remove("active");
     } else {
         paintable = true;
-        draggable = false;
+        dragable = false;
 
         paint.classList.add("active");
         drag.classList.remove("active");
@@ -28,11 +28,11 @@ paint.addEventListener("click", () => {
 drag.addEventListener("click", () => {
     //toggles dragging
     if (drag.classList.contains("active")) {
-        draggable = false;
+        dragable = false;
 
         drag.classList.remove("active");
     } else {
-        draggable = true;
+        dragable = true;
         paintable = false;
 
         drag.classList.add("active");

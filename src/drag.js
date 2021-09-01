@@ -43,7 +43,7 @@ function mouseLeave(e) {
 }
 
 function mouseMove(e) {
-    if (!draggable) {
+    if (!dragable) {
         return;
     }
 

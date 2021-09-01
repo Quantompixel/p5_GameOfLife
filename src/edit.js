@@ -1,5 +1,5 @@
 let paintable = true;
-let draggable = false;
+let dragable = false;
 
 let highlightedCells = [];
 
