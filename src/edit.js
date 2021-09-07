@@ -3,7 +3,9 @@ let dragable = false;
 
 let highlightedCells = [];
 
+let normalDraw = true;
 let lineDrawing = false;
+let formDrawing = false;
 
 // #Pattern
 const testPattern = [
@@ -12,8 +14,7 @@ const testPattern = [
     [0, 1, 1]
 ];
 
-const formFunction = new ActivatingSpecialFunction('f', () => {
-    // console.log("typed");
+function drawForm() {
     const gridX = Math.floor(mouseX / cellSize);
     const gridY = Math.floor(mouseY / cellSize);
 
@@ -26,160 +27,10 @@ const formFunction = new ActivatingSpecialFunction('f', () => {
 
             // draw pattern on canvas
             const element = field.cellArray[gridY + i][gridX + j];
-            element.highlight();
+            highlight(element);
         }
     }
-});
-
-const lineFunction = new ToggleableSpecialFunction('l', "Line", (xStart, yStart, xEnd, yEnd) => drawLine(xStart, yStart, xEnd, yEnd));
-
-/**
- * Special Functions that have a keybinding
- * For example lines, forms, ...
- * @type {ToggleableSpecialFunction[]|ActivatingSpecialFunction[]}
- */
-const functions = [formFunction, lineFunction];
-
-/**
- * Returns true if the highlighted cells should be recalculated and redrawn,
- * false otherwise
- * @returns {boolean} whether or not to clear the highlighted cells
- */
-function defaultShouldClearHighlight() {
-    const lastCell = getCellFromScreenPosition(pmouseY, pmouseX);
-    const currentCell = getCellFromScreenPosition(mouseY, mouseX);
-    return !(lastCell.y === currentCell.y && lastCell.x === currentCell.x);
-}
-
-/**
- * A special function that is activated once, when the key is pressed
- * Does not highlight anything
- * @param {String} keyBind the key that activates this function
- * @param {Function} drawFunction a function that draws this element
- */
-function ActivatingSpecialFunction(keyBind, drawFunction) {
-    this.keyBind = keyBind;
-    this.drawFunction = drawFunction;
-    this.update = () => {
-        this.drawFunction();
-    };
-    /**
-     * Returns whether or not to clear highlights
-     */
-    this.shouldClearHighlights = () => {
-        return defaultShouldClearHighlight();
-    };
-}
-
-/**
- * Special function, for example a line
- *
- * @param {String} keyBind the key that activates this function
- * @param {String} name the name of this function
- * @param {Function}drawFunction a function that takes the mouse positions and draws this function
- */
-function ToggleableSpecialFunction(keyBind, name, drawFunction) {
-    this.keyBind = keyBind;
-    this.drawFunction = drawFunction;
-    /**
-     * Is this function currently highlighting anything / is it active
-     * @type {Boolean}
-     */
-    this.highlighting = false;
-    this.xStart = undefined;
-    this.yStart = undefined;
-    /**
-     * User-friendly name of this function
-     * @type {String}
-     */
-    this.name = name;
-
-    /**
-     * Updates the highlighting value
-     */
-    this.update = () => {
-        this.highlighting = !this.highlighting;
-
-        if (this.highlighting) {
-            this.xStart = mouseX;
-            this.yStart = mouseY;
-        } else {
-            makeHighlightsPermanent();
-        }
-    };
-
-    this.mouseEvent = () => {
-        if (this.highlighting) {
-            this.drawFunction(this.xStart, this.yStart, mouseX, mouseY);
-        }
-    };
-    /**
-     * Returns whether or not to clear highlights
-     */
-    this.shouldClearHighlights = () => {
-        return defaultShouldClearHighlight();
-    };
-}
-
-
-function keyTyped() {
-    // activate line drawing
-    for (let specialFunction of functions) {
-        if (specialFunction.keyBind === key) {
-            specialFunction.update();
-        }
-    }
-}
-
-function mousePressed() {
-    for (let specialFunction of functions) {
-        if (specialFunction.mouseEvent) {
-            specialFunction.mouseEvent();
-        }
-    }
-}
-
-function mouseDragged() {
-    let overwrittenBySpecialFunction = false;
-    for (let specialFunction of functions) {
-        if (specialFunction.highlighting) {
-            specialFunction.mouseEvent();
-            overwrittenBySpecialFunction = true;
-        }
-    }
-    if (!overwrittenBySpecialFunction) {
-        if (paintable) {
-            const drawCell = getCellFromScreenPosition(mouseY, mouseX);
-            if (typeof drawCell !== 'undefined') {
-                // - LMB to draw
-                // - RMB to erase
-                drawCell.alive = mouseButton !== LEFT;
-                drawCell.changeState();
-            }
-
-        }
-    }
-}
-
-function draw() {
-    //--> clears all highlighted cells
-    if (functions.every((specialFunction) => specialFunction.shouldClearHighlights())) {
-        highlightedCells.forEach((cell) => {
-            cell.cancelHighlight();
-            highlightedCells = [];
-        });
-    }
-
-    //Displays the active functions in the paint button
-    const activeFunctionsText = functions.filter((specFunction) => specFunction.highlighting)
-        .map((specFunction) => specFunction.name)
-        .join(" ");
-    const paint = document.getElementById("paint");
-    const text = `paint<br>${activeFunctionsText}`;
-    if (paint.innerHTML !== text) {
-        paint.innerHTML = text;
-    }
-}
+};
 
 function drawLine(xStart, yStart, xEnd, yEnd) {
     let startCell = getCellFromScreenPosition(yStart, xStart);
@@ -218,6 +69,117 @@ function drawLine(xStart, yStart, xEnd, yEnd) {
 
     highlight(startCell);
     highlight(endCell);
+}
+
+function keyTyped() {
+    switch (key) {
+        case 'p':
+            normalDraw = true;
+            lineDrawing = false;
+            formDrawing = false;
+            break;
+        case 'l':
+            lineDrawing = true;
+            normalDraw = false;
+            formDrawing = false;
+            break;
+        case 'f':
+            formDrawing = true;
+            normalDraw = false;
+            lineDrawing = false;
+            break;
+    }
+}
+
+let startOfTouch = {
+    x: undefined,
+    y: undefined
+}
+
+let endOfTouch = {
+    x: undefined,
+    y: undefined
+}
+
+function mousePressed() {
+    startOfTouch.x = mouseX;
+    startOfTouch.y = mouseY;
+
+    update(true);
+}
+
+function mouseReleased() {
+    endOfTouch.x = mouseX;
+    endOfTouch.y = mouseY;
+
+    update(true);
+}
+
+function mouseDragged() {
+    endOfTouch.x = mouseX;
+    endOfTouch.y = mouseY;
+
+    // Only updates if the mouse enters a new cell has changed 
+    // -> not multiple times a second like draw()
+    if (mouseX % cellSize === 0 || mouseY % cellSize === 0) {
+        endOfTouch.x = mouseX;
+        endOfTouch.y = mouseY;
+
+        update();
+    }
+}
+
+function mouseMoved() {
+    if (mouseX % cellSize === 0 || mouseY % cellSize === 0) {
+        if (formDrawing) {
+            update();
+        }
+    }
+}
+
+/** 
+ * Update is called everytime the mouse enters a new cell
+ * @param {Boolean} drawOnNextFrame if set to TRUE the next update will draw the highlighted cells
+ */
+function update(drawOnNextFrame = false) {
+    if (!paintable) {
+        return;
+    }
+
+    highlightedCells.forEach((cell) => {
+        cell.cancelHighlight();
+        highlightedCells = [];
+    });
+    //--> clears all highlighted cells
+
+    // - here - implement switch case which defines which of the drawing functions should be activated
+    if (normalDraw) {
+        let drawCell = getCellFromScreenPosition(mouseY, mouseX);
+        drawCell.alive = true;
+        drawCell.updateColor(true);
+        return;
+    }
+
+    if (lineDrawing) {
+        drawLine(startOfTouch.x, startOfTouch.y, endOfTouch.x, endOfTouch.y);
+
+        if (drawOnNextFrame) {
+            makeHighlightsPermanent();
+        }
+        return;
+    }
+
+    if (formDrawing) {
+        drawForm();
+
+        if (drawOnNextFrame) {
+            makeHighlightsPermanent();
+        }
+
+        return;
+    }
+
+
 }
 
 /**
