@@ -6,7 +6,7 @@ const cellSize = 20;
 let field;
 
 function setup() {
-    const canvas = createCanvas(canvasWidth, canvasHeight);
+    createCanvas(canvasWidth, canvasHeight);
     //canvas id: #defaultCanvas0
     frameRate(80);
 
@@ -48,19 +48,11 @@ function Field(width, height, cellSize) {
                 if (cell.alive) {
                     //cell lives
                     //next gen -->
-                    if (aliveNeighbours == 2 || aliveNeighbours == 3) {
-                        cell.futureState = true;
-                    } else {
-                        cell.futureState = false;
-                    }
+                    cell.futureState = aliveNeighbours === 2 || aliveNeighbours === 3;
                 } else {
                     //cell is dead
                     //next gen -->
-                    if (aliveNeighbours == 3) {
-                        cell.futureState = true;
-                    } else {
-                        cell.futureState = false;
-                    }
+                    cell.futureState = aliveNeighbours === 3;
                 }
             }
         }
@@ -70,7 +62,7 @@ function Field(width, height, cellSize) {
                 const cell = this.cellArray[i][k];
 
                 //optimization: only looks at cells that is has to
-                if (cell.alive == false && cell.aliveNeighbours == 0) {
+                if (cell.alive === false && cell.aliveNeighbours === 0) {
                     continue;
                 }
 
@@ -88,10 +80,7 @@ function Field(width, height, cellSize) {
     }
 
     this.checkNeighbours = function (x, y) {
-
-        const aliveNeighbours = this.isAlive(x - 1, y - 1) + this.isAlive(x, y - 1) + this.isAlive(x + 1, y - 1) + this.isAlive(x - 1, y) + this.isAlive(x + 1, y) + this.isAlive(x - 1, y + 1) + this.isAlive(x, y + 1) + this.isAlive(x + 1, y + 1);
-
-        return aliveNeighbours;
+        return this.isAlive(x - 1, y - 1) + this.isAlive(x, y - 1) + this.isAlive(x + 1, y - 1) + this.isAlive(x - 1, y) + this.isAlive(x + 1, y) + this.isAlive(x - 1, y + 1) + this.isAlive(x, y + 1) + this.isAlive(x + 1, y + 1);
     }
 
     this.isAlive = function (x, y) {

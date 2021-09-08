@@ -30,7 +30,7 @@ function drawForm() {
             highlight(element);
         }
     }
-};
+}
 
 function drawLine(xStart, yStart, xEnd, yEnd) {
     let startCell = getCellFromScreenPosition(yStart, xStart);
@@ -175,8 +175,6 @@ function update(drawOnNextFrame = false) {
         if (drawOnNextFrame) {
             makeHighlightsPermanent();
         }
-
-        return;
     }
 
 
