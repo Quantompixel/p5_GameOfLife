@@ -49,7 +49,7 @@ function mouseMove(e) {
 
     if (isDown) {
         e.preventDefault();
-        //Move vertcally
+        //Move vertically
         const y = e.pageY - canvas.offsetTop;
         const walkY = y - startY;
         //canvas.scrollTop = scrollTop - walkY;
