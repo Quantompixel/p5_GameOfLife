@@ -126,12 +126,9 @@ function Cell(field, x, y, cellSize, alive, futureState) {
     }
 
     this.updateColor = function (alive) {
-        //stroke(0, 0, 0, 50);
-        if (alive) {
-            fill(0);
-        } else {
-            fill(255);
-        }
+        noStroke();
+
+        alive ? fill(0) : fill(255);
 
         rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize - 1, this.cellSize - 1);
     }
