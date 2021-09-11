@@ -22,11 +22,12 @@ const testPattern = [
     [0, 1, 1]
 ];
 
+
 /** 
- * 
+ * Class to create special-draw-functions
  * @constructor
- * @param {hotkey} Key that activates the specialfunction
- * @param {drawFunc} Callback-function that highlights
+ * @param {String} hotkey hotkey that activates the specialfunction
+ * @param {Function} drawFunc Callback-function that highlights
  */
 class specialFunction {
     constructor(hotkey, drawFunc) {
@@ -55,6 +56,13 @@ class specialFunction {
         }
 
         if (!this.isDeactivated) {
+            // erase on right mouseButton
+            if (mouseButton === RIGHT) {
+                eraseHighlights();
+                return;
+            }
+
+            // draw on left mouseButton
             makeHighlightsPermanent();
         }
     }
@@ -82,12 +90,23 @@ const lineFunc = new specialFunction('l', () => {
     drawLine(startOfTouch.x, startOfTouch.y, endOfTouch.x, endOfTouch.y);
 });
 
-const formFunc = new specialFunction('f', drawForm);
+const formFunc = new specialFunction('f', () => {
+    drawForm(testPattern);
+});
 
 const normalFunc = new specialFunction('p', () => {
     let cell = getCellFromScreenPosition(mouseY, mouseX);
-    cell.alive = true;
-    cell.updateColor(true);
+
+    switch(mouseButton) {
+        case RIGHT:
+            cell.alive = false;
+            cell.updateColor(false);
+            break;
+        case LEFT:
+            cell.alive = true;
+            cell.updateColor(true);
+            break;
+    }
 });
 
 
@@ -118,14 +137,14 @@ function mouseMoved() {
 }
 
 
-function drawForm() {
+function drawForm(arr) {
     const gridX = Math.floor(mouseX / cellSize);
     const gridY = Math.floor(mouseY / cellSize);
 
-    for (let i = 0; i < testPattern.length; i++) {
-        for (let j = 0; j < testPattern[i].length; j++) {
+    for (let i = 0; i < arr.length; i++) {
+        for (let j = 0; j < arr[i].length; j++) {
             // read pattern
-            if (testPattern[i][j] === 0) {
+            if (arr[i][j] === 0) {
                 continue;
             }
 
@@ -220,5 +239,12 @@ function makeHighlightsPermanent() {
     highlightedCells.forEach((cell) => {
         cell.alive = true;
         cell.updateColor(true);
+    });
+}
+
+function eraseHighlights() {
+    highlightedCells.forEach((cell) => {
+        cell.alive = false;
+        cell.updateColor(false);
     });
 }
