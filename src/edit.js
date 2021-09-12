@@ -97,7 +97,7 @@ const formFunc = new specialFunction('f', () => {
 const normalFunc = new specialFunction('p', () => {
     let cell = getCellFromScreenPosition(mouseY, mouseX);
 
-    switch(mouseButton) {
+    switch (mouseButton) {
         case RIGHT:
             cell.alive = false;
             cell.updateColor(false);
@@ -108,6 +108,7 @@ const normalFunc = new specialFunction('p', () => {
             break;
     }
 });
+normalFunc.activate();
 
 
 function mousePressed() {

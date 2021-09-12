@@ -7,11 +7,13 @@ const slider = document.getElementById("slider");
 import * as Timer from './modules/interval.js';
 
 Timer.createInterval(30, () => {
-    field.update();
+    requestAnimationFrame(() => {
+        field.update();
+    })
 });
 
 paint.addEventListener("click", () => {
-    //toggles painting
+    // toggles painting
     if (paint.classList.contains("active")) {
         paintable = false;
 
@@ -26,7 +28,7 @@ paint.addEventListener("click", () => {
 });
 
 drag.addEventListener("click", () => {
-    //toggles dragging
+    // toggles dragging
     if (drag.classList.contains("active")) {
         dragable = false;
 
@@ -64,7 +66,7 @@ slider.addEventListener("input", (event) => {
 });
 
 
-//disables paint when hovering buttons
+// disables paint when hovering buttons
 const controlButtons = document.querySelectorAll("nav .controlButton");
 controlButtons.forEach(element => {
     element.addEventListener("mouseenter", () => {
