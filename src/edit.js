@@ -90,6 +90,14 @@ const lineFunc = new specialFunction('l', () => {
     drawLine(startOfTouch.x, startOfTouch.y, endOfTouch.x, endOfTouch.y);
 });
 
+const rectFunc = new specialFunction('r', () => {
+    drawRect(startOfTouch.x, startOfTouch.y, endOfTouch.x, endOfTouch.y);
+});
+
+const circleFunc = new specialFunction('c', () => {
+    drawCircle(getCellFromScreenPosition(startOfTouch.x, startOfTouch.y), Math.max(endOfTouch.x, endOfTouch.y) / cellSize);
+});
+
 const formFunc = new specialFunction('f', () => {
     drawForm(testPattern);
 });
@@ -123,6 +131,7 @@ function mouseReleased() {
     endOfTouch.y = mouseY;
 
     lineFunc.draw();
+    rectFunc.draw();
 }
 
 function mouseDragged() {
@@ -130,7 +139,10 @@ function mouseDragged() {
     endOfTouch.y = mouseY;
 
     lineFunc.update();
-    normalFunc.isDeactivated ? null : normalFunc.update();
+    rectFunc.update();
+    normalFunc.isDeactivated
+        ? null
+        : normalFunc.update();
 }
 
 function mouseMoved() {
@@ -154,7 +166,7 @@ function drawForm(arr) {
             highlight(element);
         }
     }
-};
+}
 
 function drawLine(xStart, yStart, xEnd, yEnd) {
     let startCell = getCellFromScreenPosition(yStart, xStart);
@@ -193,6 +205,18 @@ function drawLine(xStart, yStart, xEnd, yEnd) {
 
     highlight(startCell);
     highlight(endCell);
+
+}
+
+function drawCircle(startCell, radius) {
+
+}
+
+function drawRect(xStart, yStart, xEnd, yEnd) {
+    drawLine(xStart, yStart, xEnd, yStart);
+    drawLine(xEnd, yStart, xEnd, yEnd);
+    drawLine(xStart, yEnd, xEnd, yEnd);
+    drawLine(xStart, yStart, xStart, yEnd);
 }
 
 
