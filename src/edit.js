@@ -39,13 +39,11 @@ class specialFunction {
     }
 
     update() {
-        clearAllHighlights();
-
         if (!paintable) {
             return;
         }
-
         if (!this.isDeactivated) {
+            clearAllHighlights();
             this.drawFunc();
         }
     }
