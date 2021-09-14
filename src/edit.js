@@ -228,6 +228,8 @@ function drawLine(xStart, yStart, xEnd, yEnd) {
  * @param {number} radius
  */
 function drawCircle(startCell, radius) {
+    radius = 10;
+
     console.log(`radius: ${radius}`);
     console.log(`startCell: ${startCell}`);
     highlight(startCell);
@@ -242,13 +244,15 @@ function drawCircle(startCell, radius) {
     do {
         let neighbours = currentCell.getNeighbors();
         neighbours = neighbours.map(cell => {
-            const dev = value - (cell.x * cell.x + cell.y * cell.y);
+            let yd = cell.y - startCell.y;
+            let xd = cell.x - startCell.x;
+            const dev = Math.abs(value - (xd * xd + yd * yd));
             return {
                 cell: cell,
                 deviation: dev
             };
         }).sort((a, b) => {
-            return Math.abs(a.deviation - b.deviation);
+            return a.deviation - b.deviation;
         });
         let nextCell;
         do {
@@ -260,7 +264,7 @@ function drawCircle(startCell, radius) {
 
         lastCell = currentCell;
         currentCell = nextCell;
-    } while (currentCell !== startCell && index++ < 1000);
+    } while (currentCell !== startCell && index++ < 100);
 
 
 }
