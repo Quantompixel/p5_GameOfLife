@@ -93,7 +93,10 @@ const rectFunc = new specialFunction('r', () => {
 });
 
 const circleFunc = new specialFunction('c', () => {
-    drawCircle(getCellFromScreenPosition(startOfTouch.x, startOfTouch.y), Math.max(endOfTouch.x, endOfTouch.y) / cellSize);
+    const deltaXX = endOfTouch.x - startOfTouch.x;
+    const deltyYY = endOfTouch.y - startOfTouch.y;
+    const radius = Math.sqrt(deltaXX * deltaXX + deltyYY * deltyYY) / cellSize;
+    drawCircle(getCellFromScreenPosition(startOfTouch.y, startOfTouch.x), radius);
 });
 
 const formFunc = new specialFunction('f', () => {
@@ -130,6 +133,7 @@ function mouseReleased() {
 
     lineFunc.draw();
     rectFunc.draw();
+    circleFunc.draw();
 }
 
 function mouseDragged() {
@@ -138,6 +142,8 @@ function mouseDragged() {
 
     lineFunc.update();
     rectFunc.update();
+    circleFunc.update();
+
     normalFunc.isDeactivated
         ? null
         : normalFunc.update();
@@ -167,6 +173,7 @@ function drawForm(arr) {
 }
 
 function drawLine(xStart, yStart, xEnd, yEnd) {
+    console.log(`xStart: ${xStart}  yStart: ${yStart}  xEnd: ${xEnd}  yEnd: ${yEnd}`);
     let startCell = getCellFromScreenPosition(yStart, xStart);
     let endCell = getCellFromScreenPosition(yEnd, xEnd);
     const minCellY = Math.floor(Math.min(yStart, yEnd) / cellSize);
@@ -206,7 +213,55 @@ function drawLine(xStart, yStart, xEnd, yEnd) {
 
 }
 
+/**
+ * Given the formula
+ * <pre>
+ *     x*x + y*y = r*r
+ * Starting at x = radius, y = 0
+ * For each neighbour:
+ *      deviation = radius*radius - (neighbor.x*neighbor.x + neighbor.y*neighbor.y)
+ * Select neighbour with smallest deviation and not last cell
+ * Repeat until selected neighbor is the start cell
+ * </pre>
+
+ * @param {Cell} startCell
+ * @param {number} radius
+ */
 function drawCircle(startCell, radius) {
+    console.log(`radius: ${radius}`);
+    console.log(`startCell: ${startCell}`);
+    highlight(startCell);
+
+    const value = radius * radius;
+
+    let lastCell = undefined;
+    let currentCell = getCellFromIndex(startCell.y, startCell.x + Math.floor(radius));
+    console.log(`currentCell: ${currentCell}`);
+
+    let index = 0;
+    do {
+        let neighbours = currentCell.getNeighbors();
+        neighbours = neighbours.map(cell => {
+            const dev = value - (cell.x * cell.x + cell.y * cell.y);
+            return {
+                cell: cell,
+                deviation: dev
+            };
+        }).sort((a, b) => {
+            return Math.abs(a.deviation - b.deviation);
+        });
+        let nextCell;
+        do {
+            nextCell = neighbours.shift().cell;
+        } while (nextCell === lastCell);
+        console.log(`nextCell: ${nextCell}`);
+
+        highlight(currentCell);
+
+        lastCell = currentCell;
+        currentCell = nextCell;
+    } while (currentCell !== startCell && index++ < 1000);
+
 
 }
 
