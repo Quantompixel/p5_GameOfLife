@@ -228,18 +228,11 @@ function drawLine(xStart, yStart, xEnd, yEnd) {
  * @param {number} radius
  */
 function drawCircle(startCell, radius) {
-    radius = 10;
-
-    console.log(`radius: ${radius}`);
-    console.log(`startCell: ${startCell}`);
-    highlight(startCell);
-
     const value = radius * radius;
+    const max = 2 * radius * 3; //Rounding PI
 
     let lastCell = undefined;
     let currentCell = getCellFromIndex(startCell.y, startCell.x + Math.floor(radius));
-    console.log(`currentCell: ${currentCell}`);
-
     let index = 0;
     do {
         let neighbours = currentCell.getNeighbors();
@@ -258,13 +251,12 @@ function drawCircle(startCell, radius) {
         do {
             nextCell = neighbours.shift().cell;
         } while (nextCell === lastCell);
-        console.log(`nextCell: ${nextCell}`);
 
         highlight(currentCell);
 
         lastCell = currentCell;
         currentCell = nextCell;
-    } while (currentCell !== startCell && index++ < 100);
+    } while (!currentCell.equals(startCell) && index++ < max && currentCell);
 
 
 }

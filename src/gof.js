@@ -168,4 +168,11 @@ function Cell(field, x, y, cellSize, alive, futureState) {
     this.toString = () => {
         return `Cell{alive:${this.alive}, x:${this.x}, y: ${this.y}, aliveNeighbours: ${this.aliveNeighbours}`;
     };
-};
+
+    /**
+     * @param {Cell} other
+     */
+    this.equals = (other) => {
+        return this.x === other.x && this.y === other.y && this.alive === other.alive;
+    };
+}
