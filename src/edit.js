@@ -39,13 +39,11 @@ class specialFunction {
     }
 
     update() {
-        clearAllHighlights();
-
         if (!paintable) {
             return;
         }
-
         if (!this.isDeactivated) {
+            clearAllHighlights();
             this.drawFunc();
         }
     }
@@ -90,6 +88,17 @@ const lineFunc = new specialFunction('l', () => {
     drawLine(startOfTouch.x, startOfTouch.y, endOfTouch.x, endOfTouch.y);
 });
 
+const rectFunc = new specialFunction('r', () => {
+    drawRect(startOfTouch.x, startOfTouch.y, endOfTouch.x, endOfTouch.y);
+});
+
+const circleFunc = new specialFunction('c', () => {
+    const deltaXX = endOfTouch.x - startOfTouch.x;
+    const deltyYY = endOfTouch.y - startOfTouch.y;
+    const radius = Math.sqrt(deltaXX * deltaXX + deltyYY * deltyYY) / cellSize;
+    drawCircle(getCellFromScreenPosition(startOfTouch.y, startOfTouch.x), radius);
+});
+
 const formFunc = new specialFunction('f', () => {
     drawForm(testPattern);
 });
@@ -123,6 +132,8 @@ function mouseReleased() {
     endOfTouch.y = mouseY;
 
     lineFunc.draw();
+    rectFunc.draw();
+    circleFunc.draw();
 }
 
 function mouseDragged() {
@@ -130,7 +141,12 @@ function mouseDragged() {
     endOfTouch.y = mouseY;
 
     lineFunc.update();
-    normalFunc.isDeactivated ? null : normalFunc.update();
+    rectFunc.update();
+    circleFunc.update();
+
+    normalFunc.isDeactivated
+        ? null
+        : normalFunc.update();
 }
 
 function mouseMoved() {
@@ -154,9 +170,10 @@ function drawForm(arr) {
             highlight(element);
         }
     }
-};
+}
 
 function drawLine(xStart, yStart, xEnd, yEnd) {
+    console.log(`xStart: ${xStart}  yStart: ${yStart}  xEnd: ${xEnd}  yEnd: ${yEnd}`);
     let startCell = getCellFromScreenPosition(yStart, xStart);
     let endCell = getCellFromScreenPosition(yEnd, xEnd);
     const minCellY = Math.floor(Math.min(yStart, yEnd) / cellSize);
@@ -193,6 +210,62 @@ function drawLine(xStart, yStart, xEnd, yEnd) {
 
     highlight(startCell);
     highlight(endCell);
+
+}
+
+/**
+ * Given the formula
+ * <pre>
+ *     x*x + y*y = r*r
+ * Starting at x = radius, y = 0
+ * For each neighbour:
+ *      deviation = radius*radius - (neighbor.x*neighbor.x + neighbor.y*neighbor.y)
+ * Select neighbour with smallest deviation and not last cell
+ * Repeat until selected neighbor is the start cell
+ * </pre>
+
+ * @param {Cell} startCell
+ * @param {number} radius
+ */
+function drawCircle(startCell, radius) {
+    const value = radius * radius;
+    const max = 2 * radius * 3; //Rounding PI
+
+    let lastCell = undefined;
+    let currentCell = getCellFromIndex(startCell.y, startCell.x + Math.floor(radius));
+    let index = 0;
+    do {
+        let neighbours = currentCell.getNeighbors();
+        neighbours = neighbours.map(cell => {
+            let yd = cell.y - startCell.y;
+            let xd = cell.x - startCell.x;
+            const dev = Math.abs(value - (xd * xd + yd * yd));
+            return {
+                cell: cell,
+                deviation: dev
+            };
+        }).sort((a, b) => {
+            return a.deviation - b.deviation;
+        });
+        let nextCell;
+        do {
+            nextCell = neighbours.shift().cell;
+        } while (nextCell === lastCell);
+
+        highlight(currentCell);
+
+        lastCell = currentCell;
+        currentCell = nextCell;
+    } while (!currentCell.equals(startCell) && index++ < max && currentCell);
+
+
+}
+
+function drawRect(xStart, yStart, xEnd, yEnd) {
+    drawLine(xStart, yStart, xEnd, yStart);
+    drawLine(xEnd, yStart, xEnd, yEnd);
+    drawLine(xStart, yEnd, xEnd, yEnd);
+    drawLine(xStart, yStart, xStart, yEnd);
 }
 
 

@@ -128,7 +128,9 @@ function Cell(field, x, y, cellSize, alive, futureState) {
     this.updateColor = function (alive) {
         noStroke();
 
-        alive ? fill(0) : fill(255);
+        alive
+            ? fill(0)
+            : fill(255);
 
         rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize - 1, this.cellSize - 1);
     }
@@ -137,12 +139,40 @@ function Cell(field, x, y, cellSize, alive, futureState) {
         noStroke();
         fill(220);
         rect(this.x * this.cellSize, this.y * this.cellSize, this.cellSize - 1, this.cellSize - 1);
-    }
+    };
+    /**
+     * @returns {Cell[]}
+     */
+    this.getNeighbors = function () {
+        const neighbors = [];
+        for (let x = -1; x <= 1; x++) {
+            for (let y = -1; y <= 1; y++) {
+                if (x === 0 && y === 0) {
+                    continue;
+                }
+                const row = field.cellArray[this.y + y];
+                if (row) {
+                    const element = row[this.x + x];
+                    if (element) {
+                        neighbors.push(element);
+                    }
+                }
+            }
+        }
+        return neighbors;
+    };
 
     this.cancelHighlight = function () {
         this.updateColor(this.alive);
-    }
+    };
     this.toString = () => {
-        return `Cell{alive:${this.alive}, x:${this.x}, y: ${this.y}, aliveNeighbours: ${this.aliveNeighbours}`
-    }
+        return `Cell{alive:${this.alive}, x:${this.x}, y: ${this.y}, aliveNeighbours: ${this.aliveNeighbours}`;
+    };
+
+    /**
+     * @param {Cell} other
+     */
+    this.equals = (other) => {
+        return this.x === other.x && this.y === other.y && this.alive === other.alive;
+    };
 }
