@@ -15,13 +15,6 @@ let endOfTouch = {
     y: undefined
 }
 
-// #Pattern
-const testPattern = [
-    [0, 0, 1],
-    [1, 0, 1],
-    [0, 1, 1]
-];
-
 
 /** 
  * Class to create special-draw-functions
@@ -30,10 +23,13 @@ const testPattern = [
  * @param {Function} drawFunc Callback-function that highlights
  */
 class specialFunction {
-    constructor(hotkey, drawFunc) {
+    constructor(hotkey, drawFunc, finalFunc = () => {
+        return
+    }) {
         this.hotkey = hotkey;
         this.drawFunc = drawFunc;
         this.isDeactivated = true;
+        this.finalFunc = finalFunc;
 
         specialFunctions.push(this);
     }
@@ -52,6 +48,8 @@ class specialFunction {
         if (!paintable) {
             return;
         }
+
+        this.finalFunc();
 
         if (!this.isDeactivated) {
             // erase on right mouseButton
@@ -105,7 +103,6 @@ const formFunc = new specialFunction('f', () => {
 
 const normalFunc = new specialFunction('p', () => {
     let cell = getCellFromScreenPosition(mouseY, mouseX);
-
     switch (mouseButton) {
         case RIGHT:
             cell.alive = false;
@@ -119,6 +116,21 @@ const normalFunc = new specialFunction('p', () => {
 });
 normalFunc.activate();
 
+const selectFunc = new specialFunction('s', () => {
+    drawRect(startOfTouch.x, startOfTouch.y, endOfTouch.x, endOfTouch.y);
+}, () => {
+    const area = {
+        start : {
+            x: Math.floor(startOfTouch.x / cellSize),
+            y: Math.floor(startOfTouch.y / cellSize)
+        },
+        end : {
+            x: Math.floor(endOfTouch.x / cellSize),
+            y: Math.floor(endOfTouch.y / cellSize)
+        }
+    }
+    savePattern(area.start.x,area.start.y,area.end.x,area.end.y);
+});
 
 function mousePressed() {
     startOfTouch.x = mouseX;
@@ -134,6 +146,9 @@ function mouseReleased() {
     lineFunc.draw();
     rectFunc.draw();
     circleFunc.draw();
+    selectFunc.isDeactivated ?
+        null :
+        selectFunc.draw();
 }
 
 function mouseDragged() {
@@ -142,11 +157,12 @@ function mouseDragged() {
 
     lineFunc.update();
     rectFunc.update();
+    selectFunc.update();
     circleFunc.update();
 
-    normalFunc.isDeactivated
-        ? null
-        : normalFunc.update();
+    normalFunc.isDeactivated ?
+        null :
+        normalFunc.update();
 }
 
 function mouseMoved() {
@@ -173,7 +189,7 @@ function drawForm(arr) {
 }
 
 function drawLine(xStart, yStart, xEnd, yEnd) {
-    console.log(`xStart: ${xStart}  yStart: ${yStart}  xEnd: ${xEnd}  yEnd: ${yEnd}`);
+    // console.log(`xStart: ${xStart}  yStart: ${yStart}  xEnd: ${xEnd}  yEnd: ${yEnd}`);
     let startCell = getCellFromScreenPosition(yStart, xStart);
     let endCell = getCellFromScreenPosition(yEnd, xEnd);
     const minCellY = Math.floor(Math.min(yStart, yEnd) / cellSize);
