@@ -21,3 +21,9 @@ nav {
 .active {
     background-color: lime;
 }
+
+#selectionInput {
+    position: fixed;
+    top: 500px;
+    visibility: hidden;
+}

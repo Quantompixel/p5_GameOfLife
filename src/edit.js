@@ -15,6 +15,7 @@ let endOfTouch = {
     y: undefined
 }
 
+let selectedPattern = [];
 
 /** 
  * Class to create special-draw-functions
@@ -50,7 +51,7 @@ class specialFunction {
         }
 
         this.finalFunc();
-
+        
         if (!this.isDeactivated) {
             // erase on right mouseButton
             if (mouseButton === RIGHT) {
@@ -98,7 +99,7 @@ const circleFunc = new specialFunction('c', () => {
 });
 
 const formFunc = new specialFunction('f', () => {
-    drawForm(testPattern);
+    drawForm(selectedPattern);
 });
 
 const normalFunc = new specialFunction('p', () => {
@@ -119,17 +120,37 @@ normalFunc.activate();
 const selectFunc = new specialFunction('s', () => {
     drawRect(startOfTouch.x, startOfTouch.y, endOfTouch.x, endOfTouch.y);
 }, () => {
+
     const area = {
-        start : {
+        start: {
             x: Math.floor(startOfTouch.x / cellSize),
             y: Math.floor(startOfTouch.y / cellSize)
         },
-        end : {
+        end: {
             x: Math.floor(endOfTouch.x / cellSize),
             y: Math.floor(endOfTouch.y / cellSize)
         }
     }
-    savePattern(area.start.x,area.start.y,area.end.x,area.end.y);
+
+    const selectInput = document.getElementById("selectionInput");
+    selectInput.style.visibility = "visible";
+
+    selectInput.style.top = (startOfTouch.y - 20) + "px";
+    selectInput.style.left = (startOfTouch.x - 20) + "px";
+    paintable = false;
+
+    selectInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            savePattern(area.start.x, area.start.y, area.end.x, area.end.y, e.target.value);
+
+            selectInput.style.visibility = "hidden";
+            selectInput.value = "";
+            paintable = true;
+        }
+    });
+
+    // clears all the highlights so nothing is drawn onto the canvas
+    clearAllHighlights();
 });
 
 function mousePressed() {

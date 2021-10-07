@@ -1,6 +1,7 @@
-function savePattern(startX, startY, endX, endY) {
+function savePattern(startX, startY, endX, endY, name) {
     let arr = [];
 
+    // console.log(name);
     for (let x = startX; x <= endX; x++) {
         let arr2nd = [];
 
@@ -10,10 +11,13 @@ function savePattern(startX, startY, endX, endY) {
 
         arr.push(arr2nd);
     }
+    localStorage.setItem(name, JSON.stringify(arr));
 
-    console.log(arr);
+    // console.log(arr);
 }
 
-function loadPattern() {
+function loadPattern(name) {
+    const pattern = JSON.parse(localStorage.getItem(name));
 
+    selectedPattern = pattern;
 }
