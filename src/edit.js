@@ -51,7 +51,7 @@ class specialFunction {
         }
 
         this.finalFunc();
-        
+
         if (!this.isDeactivated) {
             // erase on right mouseButton
             if (mouseButton === RIGHT) {
@@ -141,11 +141,20 @@ const selectFunc = new specialFunction('s', () => {
 
     selectInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
-            savePattern(area.start.x, area.start.y, area.end.x, area.end.y, e.target.value);
+            if (e.target.value !== "") {
+                savePattern(area.start.x, area.start.y, area.end.x, area.end.y, e.target.value);
+            }
 
             selectInput.style.visibility = "hidden";
             selectInput.value = "";
             paintable = true;
+        }
+        if (e.key === "Escape") {
+            selectInput.style.visibility = "hidden";
+            selectInput.value = "";
+            paintable = true;
+
+            return;
         }
     });
 
@@ -203,7 +212,7 @@ function drawForm(arr) {
             }
 
             // draw pattern on canvas
-            const element = field.cellArray[gridY + i][gridX + j];
+            const element = field.cellArray[gridY + j][gridX + i];
             highlight(element);
         }
     }
