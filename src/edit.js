@@ -140,7 +140,7 @@ const selectFunc = new specialFunction('s', () => {
     paintable = false;
 
     selectInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
+        if (e.key === 'Enter') {
             if (e.target.value !== "") {
                 savePattern(area.start.x, area.start.y, area.end.x, area.end.y, e.target.value);
             }
@@ -149,7 +149,7 @@ const selectFunc = new specialFunction('s', () => {
             selectInput.value = "";
             paintable = true;
         }
-        if (e.key === "Escape") {
+        if (key === 'Escape') {
             selectInput.style.visibility = "hidden";
             selectInput.value = "";
             paintable = true;
