@@ -18,6 +18,11 @@ nav {
     margin: 0.5vh 1vw;
 }
 
+.paintButton {
+    height: 3em;
+    margin: 0.5vh 1vw;
+}
+
 .active {
     background-color: lime;
 }

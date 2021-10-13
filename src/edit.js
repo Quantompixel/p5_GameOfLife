@@ -24,9 +24,10 @@ let selectedPattern = [];
  * @param {Function} drawFunc Callback-function that highlights
  */
 class specialFunction {
-    constructor(hotkey, drawFunc, finalFunc = () => {
+    constructor(name, hotkey, drawFunc, finalFunc = () => {
         return
     }) {
+        this.name = name;
         this.hotkey = hotkey;
         this.drawFunc = drawFunc;
         this.isDeactivated = true;
@@ -83,26 +84,26 @@ function keyTyped() {
     });
 }
 
-const lineFunc = new specialFunction('l', () => {
+const lineFunc = new specialFunction("Line", 'l', () => {
     drawLine(startOfTouch.x, startOfTouch.y, endOfTouch.x, endOfTouch.y);
 });
 
-const rectFunc = new specialFunction('r', () => {
+const rectFunc = new specialFunction("Rect", 'r', () => {
     drawRect(startOfTouch.x, startOfTouch.y, endOfTouch.x, endOfTouch.y);
 });
 
-const circleFunc = new specialFunction('c', () => {
+const circleFunc = new specialFunction("Circle", 'c', () => {
     const deltaXX = endOfTouch.x - startOfTouch.x;
     const deltyYY = endOfTouch.y - startOfTouch.y;
     const radius = Math.sqrt(deltaXX * deltaXX + deltyYY * deltyYY) / cellSize;
     drawCircle(getCellFromScreenPosition(startOfTouch.y, startOfTouch.x), radius);
 });
 
-const formFunc = new specialFunction('f', () => {
+const formFunc = new specialFunction("Pattern", 'f', () => {
     drawForm(selectedPattern);
 });
 
-const normalFunc = new specialFunction('p', () => {
+const normalFunc = new specialFunction("Normal", 'p', () => {
     let cell = getCellFromScreenPosition(mouseY, mouseX);
     switch (mouseButton) {
         case RIGHT:
@@ -117,7 +118,7 @@ const normalFunc = new specialFunction('p', () => {
 });
 normalFunc.activate();
 
-const selectFunc = new specialFunction('s', () => {
+const selectFunc = new specialFunction("Select", 's', () => {
     drawRect(startOfTouch.x, startOfTouch.y, endOfTouch.x, endOfTouch.y);
 }, () => {
 
