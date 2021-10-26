@@ -12,6 +12,13 @@ nav {
     justify-content: center;
 }
 
+#paintBar {
+    top: 13vh;
+    flex-direction: column;
+    width: 10vw;
+    
+}
+
 .controlButton {
     height: 5em;
     width: 5em;
@@ -25,6 +32,10 @@ nav {
 
 .active {
     background-color: lime;
+}
+
+#slider {
+    margin-left: auto;
 }
 
 #selectionInput {
