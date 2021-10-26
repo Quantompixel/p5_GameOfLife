@@ -79,8 +79,9 @@ function setupPaintButtons() {
         button.classList.add("paintButton");
         button.id = specialFunc.name;
 
-        const navbar = document.getElementById("paintBar");
-        navbar.insertBefore(button, navbar.childNodes[0]);
+        const navbar = document.getElementById("paintbar");
+        // navbar.insertBefore(button, navbar.childNodes[0]);
+        navbar.appendChild(button);
 
         button.addEventListener("click", () => {
             switchSpecialFunction(specialFunc.name);

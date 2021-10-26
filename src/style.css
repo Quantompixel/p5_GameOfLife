@@ -12,11 +12,14 @@ nav {
     justify-content: center;
 }
 
-#paintBar {
-    top: 13vh;
+#paintbar {
+    top: 10vh;
+    margin-left: 1.5em;
+    width: 5vw;
+    height: 50vh;
     flex-direction: column;
-    width: 10vw;
-    
+    justify-content: flex-start;
+    align-items: stretch;
 }
 
 .controlButton {
@@ -26,7 +29,7 @@ nav {
 }
 
 .paintButton {
-    height: 3em;
+    width: 5em;
     margin: 0.5vh 1vw;
 }
 
