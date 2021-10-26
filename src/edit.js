@@ -27,6 +27,17 @@ class specialFunction {
     constructor(name, hotkey, drawFunc, finalFunc = () => {
         return
     }) {
+        for (const func in specialFunctions) {
+            if (func.name === name) {
+                console.log("DrawFunction name already exists!")    
+                return;
+            }
+            if (func.hotkey === hotkey) {
+                console.log("This hotkey already exists!")    
+                return;
+            }
+        }
+
         this.name = name;
         this.hotkey = hotkey;
         this.drawFunc = drawFunc;
@@ -77,11 +88,11 @@ class specialFunction {
 
 function keyTyped() {
     specialFunctions.forEach((func) => {
-        func.deactivate();
         if (func.hotkey === key) {
-            func.activate();
+            switchSpecialFunction(func.name);
         }
     });
+    // switchSpecialFunction();
 }
 
 const lineFunc = new specialFunction("Line", 'l', () => {
@@ -99,11 +110,11 @@ const circleFunc = new specialFunction("Circle", 'c', () => {
     drawCircle(getCellFromScreenPosition(startOfTouch.y, startOfTouch.x), radius);
 });
 
-const formFunc = new specialFunction("Pattern", 'f', () => {
+const formFunc = new specialFunction("Pattern", 'p', () => {
     drawForm(selectedPattern);
 });
 
-const normalFunc = new specialFunction("Normal", 'p', () => {
+const normalFunc = new specialFunction("Normal", 'n', () => {
     let cell = getCellFromScreenPosition(mouseY, mouseX);
     switch (mouseButton) {
         case RIGHT:
@@ -200,6 +211,18 @@ function mouseMoved() {
     formFunc.update();
 }
 
+function switchSpecialFunction(name) {
+    specialFunctions.forEach((func) => {
+        const button = document.getElementById(func.name)
+        func.deactivate();
+        button.classList.remove("active");
+
+        if (func.name === name) {
+            func.activate();
+            button.classList.add("active");
+        }
+    });
+}
 
 function drawForm(arr) {
     const gridX = Math.floor(mouseX / cellSize);

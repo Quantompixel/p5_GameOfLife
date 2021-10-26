@@ -42,6 +42,7 @@ drag.addEventListener("click", () => {
     } else {
         dragable = true;
         paintable = false;
+        deactivatePaintButtons();
 
         drag.classList.add("active");
         paint.classList.remove("active");
@@ -71,29 +72,32 @@ slider.addEventListener("input", (event) => {
     Timer.updateTimeout(event.target.value);
 });
 
-function setupPaintButtons () {
+function setupPaintButtons() {
     for (const specialFunc of specialFunctions) {
         let button = document.createElement("BUTTON");
         button.innerHTML = specialFunc.name;
         button.classList.add("paintButton");
-    
+        button.id = specialFunc.name;
+
         const navbar = document.getElementById("navbar");
         navbar.insertBefore(button, navbar.childNodes[0]);
 
+        button.addEventListener("click", () => {
+            switchSpecialFunction(specialFunc.name);
+        });
+
         paintButtons.push(button);
     }
-
-    // deactivatePaintButtons();
 }
 
 
-function activatePaintButtons () {
+function activatePaintButtons() {
     for (const button of paintButtons) {
         button.style.display = "inline-block";
     }
 }
 
-function deactivatePaintButtons () {
+function deactivatePaintButtons() {
     for (const button of paintButtons) {
         button.style.display = "none";
     }
@@ -102,14 +106,23 @@ function deactivatePaintButtons () {
 
 // disables paint when hovering buttons
 const controlButtons = document.querySelectorAll("nav .controlButton");
-controlButtons.forEach(element => {
-    element.addEventListener("mouseenter", () => {
-        paintable = false;
-    });
+protectButtons(controlButtons);
+protectButtons(paintButtons);
 
-    element.addEventListener("mouseout", () => {
-        if (paint.classList.contains("active")) {
-            paintable = true;
-        }
+/**
+ * Disables painting when hovering over buttons.
+ * @param {Array} buttonArray 
+ */
+function protectButtons(buttonArray) {
+    buttonArray.forEach(element => {
+        element.addEventListener("mouseenter", () => {
+            paintable = false;
+        });
+
+        element.addEventListener("mouseout", () => {
+            if (paint.classList.contains("active")) {
+                paintable = true;
+            }
+        });
     });
-});
+}
