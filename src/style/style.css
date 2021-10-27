@@ -13,13 +13,14 @@ nav {
 }
 
 #paintbar {
-    top: 10vh;
+    /* top: 10vh; */
     margin-left: 1.5em;
     width: 5vw;
     height: 50vh;
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
+    margin-left: 0.5vh 1vw;
 }
 
 .controlButton {
@@ -45,4 +46,12 @@ nav {
     position: fixed;
     top: 500px;
     visibility: hidden;
+}
+
+@media screen and (orientation: portrait){
+    .controlButton{
+        width: 20vw;
+        height: 20vw; 
+        font-size: 30pt;
+    }
 }
