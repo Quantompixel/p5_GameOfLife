@@ -172,6 +172,38 @@ const selectFunc = new specialFunction("Select", 's', () => {
     paintable = false;
 
     selectInput.addEventListener("keydown", (e) => {
+        switch(e.key)  {
+            case 'Enter':
+                if (e.target.value !== "") {
+                    savePattern(area.start.x, area.start.y, area.end.x, area.end.y, e.target.value);
+                }
+
+                selectInput.style.visibility = "hidden";
+                selectInput.value = "";
+                paintable = true;
+                break;
+            case 'Delete':
+                for (let y = area.start.y; y <= area.end.y; y++) {
+                    for (let x = area.start.x; x <= area.end.x; x++) {
+                        const cell = getCellFromIndex(y,x);
+                        cell.alive = false;
+                        cell.updateColor(false);
+                    }
+                }
+
+                selectInput.style.visibility = "hidden";
+                selectInput.value = "";
+                paintable = true;
+
+                break;
+            case 'Escape':
+                selectInput.style.visibility = "hidden";
+                selectInput.value = "";
+                paintable = true;
+
+                break;
+        }
+
         if (e.key === 'Enter') {
             if (e.target.value !== "") {
                 savePattern(area.start.x, area.start.y, area.end.x, area.end.y, e.target.value);
@@ -181,7 +213,7 @@ const selectFunc = new specialFunction("Select", 's', () => {
             selectInput.value = "";
             paintable = true;
         }
-        if (key === 'Escape') {
+        else if (e.key === 'Escape') {
             selectInput.style.visibility = "hidden";
             selectInput.value = "";
             paintable = true;
