@@ -20,6 +20,7 @@ let selectedPattern = [];
 /** 
  * Class to create special-draw-functions
  * @constructor
+ * @param {String} name hotkey that activates the specialfunction
  * @param {String} hotkey hotkey that activates the specialfunction
  * @param {Function} drawFunc Callback-function that highlights
  */
@@ -43,8 +44,10 @@ class specialFunction {
         this.drawFunc = drawFunc;
         this.isDeactivated = true;
         this.finalFunc = finalFunc;
+        this.button
 
         specialFunctions.push(this);
+        this.setupButton();
     }
 
     update() {
@@ -83,6 +86,23 @@ class specialFunction {
 
     activate() {
         this.isDeactivated = false;
+    }
+
+    setupButton() {
+        const button = document.createElement("BUTTON");
+        button.innerHTML = this.name;
+        button.classList.add("paintButton");
+        button.id = this.name;
+
+        const navbar = document.getElementById("paintbar");
+        // navbar.insertBefore(button, navbar.childNodes[0]);
+        navbar.appendChild(button);
+
+        button.addEventListener("click", () => {
+            switchSpecialFunction(this.name);
+        });
+
+        this.button = button;
     }
 }
 
@@ -211,6 +231,7 @@ function mouseMoved() {
     formFunc.update();
 }
 
+
 function switchSpecialFunction(name) {
     specialFunctions.forEach((func) => {
         const button = document.getElementById(func.name)
@@ -223,6 +244,24 @@ function switchSpecialFunction(name) {
         }
     });
 }
+
+// function setupButton(name) {
+    // const button = document.createElement("BUTTON");
+    // button.innerHTML = name;
+    // button.classList.add("paintButton");
+    // button.id = name;
+// 
+    // const navbar = document.getElementById("paintbar");
+    // navbar.insertBefore(button, navbar.childNodes[0]);
+    // navbar.appendChild(button);
+// 
+    // button.addEventListener("click", () => {
+        // switchSpecialFunction(name);
+    // });
+// 
+    // paintButtons.push(button);
+// }
+
 
 function drawForm(arr) {
     const gridX = Math.floor(mouseX / cellSize);

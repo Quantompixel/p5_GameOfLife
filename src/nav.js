@@ -5,6 +5,9 @@ const clean = document.getElementById("clean");
 const slider = document.getElementById("slider");
 
 let paintButtons = [];
+specialFunctions.forEach((element) => {
+    paintButtons.push(element.button);
+});
 
 import * as Timer from './modules/interval.js';
 
@@ -14,7 +17,6 @@ Timer.createInterval(30, () => {
     })
 });
 
-setupPaintButtons();
 
 paint.addEventListener("click", () => {
     // toggles painting
@@ -71,26 +73,6 @@ slider.addEventListener("input", (event) => {
     //console.log(event.target.value);
     Timer.updateTimeout(event.target.value);
 });
-
-function setupPaintButtons() {
-    for (const specialFunc of specialFunctions) {
-        let button = document.createElement("BUTTON");
-        button.innerHTML = specialFunc.name;
-        button.classList.add("paintButton");
-        button.id = specialFunc.name;
-
-        const navbar = document.getElementById("paintbar");
-        // navbar.insertBefore(button, navbar.childNodes[0]);
-        navbar.appendChild(button);
-
-        button.addEventListener("click", () => {
-            switchSpecialFunction(specialFunc.name);
-        });
-
-        paintButtons.push(button);
-    }
-}
-
 
 function activatePaintButtons() {
     for (const button of paintButtons) {
