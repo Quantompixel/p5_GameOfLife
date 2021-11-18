@@ -136,25 +136,22 @@ const formFunc = new specialFunction("Pattern", 'p', () => {
     drawForm(selectedPattern);
 },undefined ,() => {
     const input = document.createElement("input");
-    // input.addEventListener
+    input.id = "patternInput";
+    input.placeholder = "load...";
     document.getElementById("Pattern").appendChild(input);
 
     input.addEventListener("keydown", (e) => {
         switch(e.key)  {
             case 'Enter':
                 if (e.target.value !== "") {
-                    // loadPattern
+                    loadPattern(input.value);
                 }
 
-                selectInput.style.visibility = "hidden";
-                selectInput.value = "";
-                paintable = true;
+                input.value = "";
                 break;
 
             case 'Escape':
-                selectInput.style.visibility = "hidden";
-                selectInput.value = "";
-                paintable = true;
+                input.value = "";
 
                 break;
         }
