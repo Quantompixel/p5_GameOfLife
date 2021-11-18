@@ -23,18 +23,17 @@ let selectedPattern = [];
  * @param {String} name hotkey that activates the specialfunction
  * @param {String} hotkey hotkey that activates the specialfunction
  * @param {Function} drawFunc Callback-function that highlights
+ * @param {Function} finalFunc Callback-function that is called when the function draws
  */
 class specialFunction {
-    constructor(name, hotkey, drawFunc, finalFunc = () => {
-        return
-    }) {
+    constructor(name, hotkey, drawFunc, finalFunc = () => {return}, setupButton = () => {return}) {
         for (const func in specialFunctions) {
             if (func.name === name) {
-                console.log("DrawFunction name already exists!")    
+                console.log("DrawFunction name already exists!");
                 return;
             }
             if (func.hotkey === hotkey) {
-                console.log("This hotkey already exists!")    
+                console.log("This hotkey already exists!");
                 return;
             }
         }
@@ -44,10 +43,11 @@ class specialFunction {
         this.drawFunc = drawFunc;
         this.isDeactivated = true;
         this.finalFunc = finalFunc;
+        this.setupButton = setupButton;
         this.button
 
         specialFunctions.push(this);
-        this.setupButton();
+        this.createButton();
     }
 
     update() {
@@ -88,7 +88,7 @@ class specialFunction {
         this.isDeactivated = false;
     }
 
-    setupButton() {
+    createButton() {
         const button = document.createElement("BUTTON");
         button.innerHTML = this.name;
         button.classList.add("paintButton");
@@ -103,6 +103,8 @@ class specialFunction {
         });
 
         this.button = button;
+
+        this.setupButton();
     }
 }
 
@@ -132,6 +134,31 @@ const circleFunc = new specialFunction("Circle", 'c', () => {
 
 const formFunc = new specialFunction("Pattern", 'p', () => {
     drawForm(selectedPattern);
+},undefined ,() => {
+    const input = document.createElement("input");
+    // input.addEventListener
+    document.getElementById("Pattern").appendChild(input);
+
+    input.addEventListener("keydown", (e) => {
+        switch(e.key)  {
+            case 'Enter':
+                if (e.target.value !== "") {
+                    // loadPattern
+                }
+
+                selectInput.style.visibility = "hidden";
+                selectInput.value = "";
+                paintable = true;
+                break;
+
+            case 'Escape':
+                selectInput.style.visibility = "hidden";
+                selectInput.value = "";
+                paintable = true;
+
+                break;
+        }
+    });
 });
 
 const normalFunc = new specialFunction("Normal", 'n', () => {
@@ -276,23 +303,6 @@ function switchSpecialFunction(name) {
         }
     });
 }
-
-// function setupButton(name) {
-    // const button = document.createElement("BUTTON");
-    // button.innerHTML = name;
-    // button.classList.add("paintButton");
-    // button.id = name;
-// 
-    // const navbar = document.getElementById("paintbar");
-    // navbar.insertBefore(button, navbar.childNodes[0]);
-    // navbar.appendChild(button);
-// 
-    // button.addEventListener("click", () => {
-        // switchSpecialFunction(name);
-    // });
-// 
-    // paintButtons.push(button);
-// }
 
 
 function drawForm(arr) {
