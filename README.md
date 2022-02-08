@@ -6,3 +6,5 @@ Features:
 - Paint
 - Move with mouse
 - (WIP: control speed of new generations)
+
+*Only works on a webserver - use it on a localhost, for example `Live Server` in Visual Studio Code*
